@@ -1,59 +1,46 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { getProducts, getCategories } from './services/api';
+import React, { useState } from 'react';
 import Navigation from './presentation/components/Navigation';
 import SearchFilters from './presentation/components/SearchFilters';
 import ProductList from './presentation/components/ProductList';
+import { useProductsQuery } from './presentation/hooks/useProductsQuery';
 import './App.css';
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     category_id: null,
     min_price: null,
     max_price: null,
+    has_entries: null,
+    barcode: null,
     order_by: 'created_at',
     order_direction: 'desc',
-    page: 1
+    page: 1,
+    per_page: 20
   });
 
-  const fetchProducts = useCallback(async () => {
-    try {
-      setLoading(true);
-      // Remove null/undefined values from filters
-      const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([_, v]) => v != null)
-      );
-      const response = await getProducts(cleanFilters);
-      setProducts(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load products');
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
-
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      fetchProducts();
-    }, 300);
-
-    return () => clearTimeout(debounceTimer);
-  }, [fetchProducts]);
+  const { 
+    data: productsData = { data: [] }, 
+    isLoading: loading, 
+    error 
+  } = useProductsQuery(
+    Object.entries(filters)
+      .filter(([_, v]) => v != null && v !== '')
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {})
+  );
 
   const handleSearch = (term) => {
     setFilters(prev => ({ ...prev, search: term, page: 1 }));
   };
 
-  const handleFilterChange = (filters) => {
+  const handleFilterChange = (newFilters) => {
     setFilters(prev => ({
       ...prev,
-      ...filters,
-      page: 1 // Reset page when filters change
+      ...newFilters,
+      page: 1
     }));
   };
 
@@ -79,9 +66,9 @@ function App() {
         selectedFilters={filters}
       />
       <ProductList 
-        products={products}
+        products={productsData.data}
         loading={loading}
-        error={error}
+        error={error?.message}
         onSortChange={handleSortChange}
         onPageChange={handlePageChange}
         currentPage={filters.page}

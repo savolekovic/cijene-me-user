@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useCategoriesQuery } from '../hooks/useProductsQuery';
 import FilterPanel from './filters/FilterPanel';
 import ActiveFilters from './filters/ActiveFilters';
-import { getCategories } from '../../services/api';
 import './SearchFilters.css';
 
 /**
@@ -26,9 +26,17 @@ const useDebounce = (callback, delay) => {
  */
 const SearchFilters = ({ onSearch, onFilterChange, selectedFilters }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [tempFilters, setTempFilters] = useState(selectedFilters);
   const [searchValue, setSearchValue] = useState(selectedFilters.search || '');
+  const [tempFilters, setTempFilters] = useState(selectedFilters);
+
+  useEffect(() => {
+    setTempFilters(selectedFilters);
+  }, [selectedFilters]);
+
+  const {
+    data: categories = [],
+    isLoading: categoriesLoading
+  } = useCategoriesQuery(isFilterOpen);
 
   const debouncedSearch = useDebounce(onSearch, 300);
 
@@ -38,28 +46,13 @@ const SearchFilters = ({ onSearch, onFilterChange, selectedFilters }) => {
     debouncedSearch(value);
   };
 
-  const handleFilterPanelOpen = async () => {
-    if (categories.length === 0) {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        console.error('Failed to fetch categories:', err);
-      }
-    }
+  const handleFilterPanelOpen = () => {
     setTempFilters(selectedFilters);
     setIsFilterOpen(true);
   };
 
-  const handleFilterChange = (newFilters) => {
-    setTempFilters(prev => ({
-      ...prev,
-      ...newFilters
-    }));
-  };
-
-  const handleApplyFilters = () => {
-    onFilterChange(tempFilters);
+  const handleClose = () => {
+    setTempFilters(selectedFilters);
     setIsFilterOpen(false);
   };
 
@@ -72,13 +65,19 @@ const SearchFilters = ({ onSearch, onFilterChange, selectedFilters }) => {
       barcode: null
     };
     onFilterChange(clearedFilters);
-    setTempFilters(clearedFilters);
     setIsFilterOpen(false);
   };
 
-  const handleClose = () => {
-    setTempFilters(selectedFilters);
+  const handleApplyFilters = () => {
+    onFilterChange(tempFilters);
     setIsFilterOpen(false);
+  };
+
+  const handleTempFilterChange = (newFilters) => {
+    setTempFilters(prev => ({
+      ...prev,
+      ...newFilters
+    }));
   };
 
   return (
@@ -125,8 +124,9 @@ const SearchFilters = ({ onSearch, onFilterChange, selectedFilters }) => {
         isOpen={isFilterOpen}
         onClose={handleClose}
         categories={categories}
+        categoriesLoading={categoriesLoading}
         selectedFilters={tempFilters}
-        onFilterChange={handleFilterChange}
+        onFilterChange={handleTempFilterChange}
         onClearAll={handleClearAll}
         onApply={handleApplyFilters}
       />

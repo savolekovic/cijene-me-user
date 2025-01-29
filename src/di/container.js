@@ -2,23 +2,39 @@ import { GetProducts } from '../core/useCases/product/GetProducts';
 import { ProductRepositoryImpl } from '../infrastructure/repositories/ProductRepositoryImpl';
 
 class Container {
+  static #instance = null;
+  #repositories = null;
+
   constructor() {
-    this.instances = new Map();
-  }
-
-  register(key, instance) {
-    this.instances.set(key, instance);
-  }
-
-  resolve(key) {
-    if (!this.instances.has(key)) {
-      throw new Error(`No instance registered for key: ${key}`);
+    if (Container.#instance) {
+      throw new Error('Use Container.getInstance() instead of new operator');
     }
-    return this.instances.get(key);
+    this.#repositories = new Map();
+    this.#registerRepositories();
+    Container.#instance = this;
+  }
+
+  #registerRepositories() {
+    this.#repositories.set('productRepository', new ProductRepositoryImpl());
+  }
+
+  static getInstance() {
+    if (!Container.#instance) {
+      Container.#instance = new Container();
+    }
+    return Container.#instance;
+  }
+
+  get(key) {
+    const repository = this.#repositories.get(key);
+    if (!repository) {
+      throw new Error(`No repository registered for key: ${key}`);
+    }
+    return repository;
   }
 }
 
-export const container = new Container();
+export const container = Container.getInstance();
 
 // Register implementations
 const productRepository = new ProductRepositoryImpl();

@@ -1,29 +1,40 @@
 import { ProductRepository } from '../../core/repositories/ProductRepository';
-import { apiClient } from '../api/client';
+import axiosClient from '../api/axiosClient';
 
 export class ProductRepositoryImpl extends ProductRepository {
   async getProducts(filters = {}) {
-    const defaultParams = {
-      search: '',
+    const requiredParams = {
       per_page: 20,
       page: 1,
       order_by: 'created_at',
       order_direction: 'desc'
     };
 
-    const cleanFilters = Object.fromEntries(
-      Object.entries({ ...defaultParams, ...filters })
-        .filter(([_, v]) => v != null)
-    );
-    
-    return apiClient.get('/products', cleanFilters);
+    const cleanFilters = {
+      ...requiredParams,
+      ...Object.entries(filters)
+        .filter(([_, value]) => value != null && value !== '')
+        .reduce((acc, [key, value]) => {
+          acc[key] = value;
+          return acc;
+        }, {})
+    };
+
+    const { data } = await axiosClient.get('products/', { 
+      params: cleanFilters 
+    });
+    return data;
   }
 
   async getCategories() {
-    return apiClient.get('/categories/simple');
+    const { data } = await axiosClient.get('categories/simple/');
+    return data;
   }
 
   async searchProducts(term) {
-    return apiClient.get('/products', { search: term });
+    const { data } = await axiosClient.get('/products', { 
+      params: { search: term } 
+    });
+    return data;
   }
 } 

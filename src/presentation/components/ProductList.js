@@ -3,9 +3,9 @@ import ProductCard from './ProductCard';
 import './ProductList.css';
 
 const ProductList = ({ 
-  products, 
-  loading, 
-  error, 
+  products = [],
+  loading,
+  error,
   onSortChange,
   onPageChange,
   currentPage,
@@ -29,6 +29,8 @@ const ProductList = ({
       </div>
     </div>
   );
+
+  if (!Array.isArray(products)) return null;
 
   const handleSortChange = (event) => {
     const [newOrderBy, newOrderDirection] = event.target.value.split('-');

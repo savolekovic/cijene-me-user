@@ -4,7 +4,8 @@ import './FilterPanel.css';
 const FilterPanel = ({ 
   isOpen, 
   onClose, 
-  categories = [], 
+  categories, 
+  categoriesLoading, 
   selectedFilters, 
   onFilterChange, 
   onClearAll,
@@ -16,6 +17,7 @@ const FilterPanel = ({
   };
 
   const handleCategoryChange = (categoryId) => {
+    console.log('Category selected:', categoryId); // Debug log
     onFilterChange({ 
       category_id: selectedFilters.category_id === categoryId ? null : categoryId 
     });
@@ -30,45 +32,42 @@ const FilterPanel = ({
   };
 
   return (
-    <div className={`filter-panel ${isOpen ? 'show' : ''}`}>
+    <div className={`filter-panel ${isOpen ? 'open' : ''}`}>
       <div className="filter-header">
         <h5>Filteri</h5>
-        <button className="btn-close" onClick={onClose}></button>
+        <button onClick={onClose}>&times;</button>
       </div>
       
       <div className="filter-content">
         <div className="filter-section">
-          <h6>Kategorija</h6>
-          <div className="radio-group">
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                id="category-all"
-                checked={!selectedFilters.category_id}
-                onChange={() => handleCategoryChange(null)}
-                name="category"
-              />
-              <label className="form-check-label" htmlFor="category-all">
-                Sve kategorije
-              </label>
-            </div>
-            {categories.map(category => (
-              <div className="form-check" key={category.id}>
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  id={`category-${category.id}`}
-                  checked={selectedFilters.category_id === category.id}
-                  onChange={() => handleCategoryChange(category.id)}
-                  name="category"
+          <h6>Kategorije</h6>
+          {categoriesLoading ? (
+            <div className="categories-loading">
+              <div className="progress" style={{ height: '2px' }}>
+                <div 
+                  className="progress-bar progress-bar-striped progress-bar-animated" 
+                  style={{ width: '100%' }}
                 />
-                <label className="form-check-label" htmlFor={`category-${category.id}`}>
-                  {category.name}
-                </label>
               </div>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="categories-list">
+              {categories.map(category => (
+                <div key={category.id} className="form-check">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id={`category-${category.id}`}
+                    checked={selectedFilters.category_id === category.id}
+                    onChange={() => handleCategoryChange(category.id)}
+                  />
+                  <label className="form-check-label" htmlFor={`category-${category.id}`}>
+                    {category.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="filter-section">
@@ -124,8 +123,12 @@ const FilterPanel = ({
       </div>
 
       <div className="filter-actions">
-        <button className="btn btn-link" onClick={onClearAll}>Poništi sve</button>
-        <button className="btn btn-primary" onClick={onApply}>Primijeni</button>
+        <button className="btn btn-outline-secondary" onClick={onClearAll}>
+          Očisti
+        </button>
+        <button className="btn btn-primary" onClick={onApply}>
+          Primijeni
+        </button>
       </div>
     </div>
   );
