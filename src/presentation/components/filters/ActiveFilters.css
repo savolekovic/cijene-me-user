@@ -1,0 +1,32 @@
+.active-filters {
+  padding: 0.5rem 0;
+}
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--background-color);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  padding: 0 0 0 0.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.btn-remove:hover {
+  color: var(--primary-color);
+} 

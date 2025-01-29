@@ -1,0 +1,146 @@
+.search-filters {
+  background-color: white;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+}
+
+.search-filters-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+/* Input group styling */
+.input-group {
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.input-group-text {
+  color: var(--text-muted);
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-right: none;
+}
+
+.form-control {
+  border: 1px solid var(--border-color);
+  border-left: none;
+}
+
+/* Remove focus outlines and add unified focus style */
+.form-control:focus,
+.input-group:focus-within .input-group-text,
+.input-group:focus-within .form-control,
+.input-group:focus-within .btn-outline-secondary {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: none;
+}
+
+/* Filter button styling */
+.btn-outline-secondary {
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  background-color: var(--background-color);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+/* Active filters section */
+.active-filters {
+  margin-top: 1rem;
+}
+
+/* Remove old unused styles */
+.search-filters .form-control:not(:focus) + .btn-link {
+  opacity: 1;
+}
+
+.dropdown-menu {
+  padding: 0.5rem;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  color: var(--text-muted);
+}
+
+.dropdown-item:hover {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 0.9rem;
+  min-width: 150px;
+}
+
+.more-filters-btn {
+  padding: 0.6rem 1rem;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.more-filters-btn:hover {
+  background-color: #1557b0;
+}
+
+.search-filters .input-group {
+  position: relative;
+}
+
+.search-filters .btn-link {
+  border: none;
+  padding: 0.375rem 0.75rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.search-filters .btn-link:hover {
+  color: var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .btn-outline-secondary {
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .btn-outline-secondary span {
+    display: none;
+  }
+} 

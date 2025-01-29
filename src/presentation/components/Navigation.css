@@ -1,0 +1,136 @@
+.navigation {
+  background-color: white;
+  padding: 0.8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-logo {
+  color: #1a73e8;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #666;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.nav-link.active {
+  color: #1a73e8;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #1a73e8;
+}
+
+.nav-center {
+  flex: 1;
+  max-width: 800px;
+  margin: 0 2rem;
+}
+
+.search-container {
+  margin-bottom: 0.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 0.9rem;
+}
+
+.more-filters-btn {
+  padding: 0.5rem 1rem;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.more-filters-btn:hover {
+  background-color: #1557b0;
+}
+
+.nav-right {
+  flex: 0 0 auto;
+}
+
+.login-btn {
+  padding: 0.5rem 1.5rem;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.login-btn:hover {
+  background-color: #1557b0;
+}
+
+@media (max-width: 768px) {
+  .navigation {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .nav-center {
+    margin: 1rem 0;
+    width: 100%;
+  }
+
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .nav-right {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+} 
