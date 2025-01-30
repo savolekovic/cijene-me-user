@@ -1,7 +1,7 @@
 /**
  * @interface
  */
-export class ProductRepository {
+export default class ProductRepository {
   /**
    * @param {import('../types/Product').ProductFilters} filters
    * @returns {Promise<{data: import('../types/Product').Product[]}>}
@@ -18,6 +18,10 @@ export class ProductRepository {
    * @returns {Promise<Array<{id: number, name: string}>>}
    */
   async getCategories() {
+    throw new Error('Method not implemented');
+  }
+
+  async getProductEntries(filters) {
     throw new Error('Method not implemented');
   }
 } 

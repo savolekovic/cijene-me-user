@@ -1,4 +1,91 @@
 .product-history-page {
   min-height: calc(100vh - 56px);
-  padding: 20px;
+  background-color: var(--background-color);
+}
+
+.history-product-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  background: white;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.history-product-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Price Statistics Cards */
+.price-stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Price History Table */
+.price-history-table {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background: var(--background-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  padding: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.price-cell {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+@media (max-width: 576px) {
+  .history-product-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .history-product-title {
+    font-size: 1.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 0.75rem;
+  }
 } 
