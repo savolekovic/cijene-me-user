@@ -66,4 +66,9 @@ export class ProductRepositoryImpl extends ProductRepository {
     });
     return data;
   }
+
+  async getProductStatistics(productId) {
+    const { data } = await this.httpClient.get(`product-entries/product/${productId}/statistics`);
+    return data;
+  }
 } 

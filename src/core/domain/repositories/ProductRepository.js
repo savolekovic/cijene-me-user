@@ -24,4 +24,8 @@ export default class ProductRepository {
   async getProductEntries(filters) {
     throw new Error('Method not implemented');
   }
+
+  async getProductStatistics(productId) {
+    throw new Error('Method not implemented');
+  }
 } 

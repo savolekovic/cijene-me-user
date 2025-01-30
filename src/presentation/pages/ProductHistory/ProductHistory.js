@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useProductEntriesQuery } from '../../hooks/products/useProductEntriesQuery';
+import { useProductStatisticsQuery } from '../../hooks/products/useProductStatisticsQuery';
 import EmptyState from '../../components/common/EmptyState/EmptyState';
 import './ProductHistory.css';
 
@@ -13,10 +14,16 @@ function ProductHistory() {
 
   const { 
     data: entriesData = { data: [] }, 
-    isLoading: loading,
-    error,
-    refetch
+    isLoading: entriesLoading,
+    error: entriesError,
+    refetch: refetchEntries
   } = useProductEntriesQuery(id, filters);
+
+  const {
+    data: statistics,
+    isLoading: statsLoading,
+    error: statsError
+  } = useProductStatisticsQuery(id);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('me', {
@@ -28,19 +35,7 @@ function ProductHistory() {
     });
   };
 
-  const priceStats = useMemo(() => {
-    if (!entriesData.data.length) return null;
-
-    const prices = entriesData.data.map(entry => parseFloat(entry.price));
-    return {
-      latest: entriesData.data[0].price,
-      lowest: Math.min(...prices).toFixed(2),
-      highest: Math.max(...prices).toFixed(2),
-      average: (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2)
-    };
-  }, [entriesData.data]);
-
-  if (loading) {
+  if (entriesLoading || statsLoading) {
     return (
       <div className="container py-5 text-center">
         <div className="loading-state">
@@ -53,7 +48,7 @@ function ProductHistory() {
     );
   }
 
-  if (error) {
+  if (entriesError || statsError) {
     return (
       <div className="container py-5">
         <EmptyState
@@ -63,7 +58,7 @@ function ProductHistory() {
           action={
             <button 
               className="btn btn-primary btn-sm"
-              onClick={refetch}
+              onClick={refetchEntries}
             >
               <i className="bi bi-arrow-clockwise me-2"></i>
               Pokušaj ponovo
@@ -126,25 +121,32 @@ function ProductHistory() {
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
               <div className="stat-label">Posljednja cijena</div>
-              <div className="stat-value">{priceStats?.latest}€</div>
+              <div className="stat-value">
+                {statistics?.latest_price}€
+                {statistics?.price_change && (
+                  <small className={`d-block mt-1 ${statistics.price_change > 0 ? 'text-danger' : 'text-success'}`}>
+                    {statistics.price_change > 0 ? '↑' : '↓'} {Math.abs(statistics.price_change_percentage).toFixed(1)}%
+                  </small>
+                )}
+              </div>
             </div>
           </div>
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
               <div className="stat-label">Najniža cijena</div>
-              <div className="stat-value text-success">{priceStats?.lowest}€</div>
+              <div className="stat-value text-success">{statistics?.lowest_price}€</div>
             </div>
           </div>
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
               <div className="stat-label">Najviša cijena</div>
-              <div className="stat-value text-danger">{priceStats?.highest}€</div>
+              <div className="stat-value text-danger">{statistics?.highest_price}€</div>
             </div>
           </div>
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
               <div className="stat-label">Prosječna cijena</div>
-              <div className="stat-value text-primary">{priceStats?.average}€</div>
+              <div className="stat-value text-primary">{statistics?.average_price}€</div>
             </div>
           </div>
         </div>
