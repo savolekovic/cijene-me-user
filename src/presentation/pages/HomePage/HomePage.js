@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SearchFilters from '../../components/products/filters/SearchFilters/SearchFilters';
 import ProductList from '../../components/products/ProductList/ProductList';
 import { useProductsQuery } from '../../hooks/products/useProductsQuery';
+import { useFilterState } from '../../hooks/useFilterState';
 import './HomePage.css';
 
 function HomePage() {
-  const [filters, setFilters] = useState({
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const [filters, setFilters] = useFilterState({
     search: '',
     category_id: null,
     min_price: null,
@@ -13,34 +17,46 @@ function HomePage() {
     has_entries: null,
     barcode: null,
     order_by: 'created_at',
-    order_direction: 'desc',
-    page: 1,
-    per_page: 20
+    order_direction: 'desc'
+  }, {
+    excludeFromUrl: ['page', 'per_page'],
+    debounceMs: 300 // Debounce URL updates for search
   });
 
-  const { 
-    data: productsData = { data: [] }, 
-    isLoading: loading, 
-    error,
-    refetch 
-  } = useProductsQuery(
-    Object.entries(filters)
-      .filter(([_, v]) => v != null && v !== '')
-      .reduce((acc, [key, value]) => {
-        acc[key] = value;
-        return acc;
-      }, {})
-  );
+  const [pagination, setPagination] = useState({ page: 1, per_page: 20 });
 
+  // Update URL when filters change (excluding pagination)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== null && value !== '') {
+        params.set(key, value.toString());
+      }
+    });
+    
+    setSearchParams(params, { replace: true });
+  }, [filters, setSearchParams]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [filters]);
+
+  const { data: productsData = { data: [] }, isLoading: loading, error, refetch } = useProductsQuery({
+    ...filters,
+    ...pagination
+  });
+
+  // Handler updates
   const handleSearch = (term) => {
-    setFilters(prev => ({ ...prev, search: term, page: 1 }));
+    setFilters(prev => ({ ...prev, search: term }));
   };
 
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({
       ...prev,
-      ...newFilters,
-      page: 1
+      ...newFilters
     }));
   };
 
@@ -48,13 +64,12 @@ function HomePage() {
     setFilters(prev => ({
       ...prev,
       order_by: orderBy,
-      order_direction: orderDirection,
-      page: 1
+      order_direction: orderDirection
     }));
   };
 
   const handlePageChange = (page) => {
-    setFilters(prev => ({ ...prev, page }));
+    setPagination(prev => ({ ...prev, page }));
   };
 
   return (
@@ -70,7 +85,7 @@ function HomePage() {
         error={error?.message}
         onSortChange={handleSortChange}
         onPageChange={handlePageChange}
-        currentPage={filters.page}
+        currentPage={pagination.page}
         sortBy={filters.order_by}
         sortDirection={filters.order_direction}
         onRetry={refetch}
