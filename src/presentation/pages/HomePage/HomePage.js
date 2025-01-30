@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import SearchFilters from '../../components/products/filters/SearchFilters/SearchFilters';
 import ProductList from '../../components/products/ProductList/ProductList';
 import { useProductsQuery } from '../../hooks/products/useProductsQuery';
@@ -7,8 +6,6 @@ import { useFilterState } from '../../hooks/useFilterState';
 import './HomePage.css';
 
 function HomePage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  
   const [filters, setFilters] = useFilterState({
     search: '',
     category_id: null,
@@ -20,23 +17,10 @@ function HomePage() {
     order_direction: 'desc'
   }, {
     excludeFromUrl: ['page', 'per_page'],
-    debounceMs: 300 // Debounce URL updates for search
+    debounceMs: 300
   });
 
   const [pagination, setPagination] = useState({ page: 1, per_page: 20 });
-
-  // Update URL when filters change (excluding pagination)
-  useEffect(() => {
-    const params = new URLSearchParams();
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== null && value !== '') {
-        params.set(key, value.toString());
-      }
-    });
-    
-    setSearchParams(params, { replace: true });
-  }, [filters, setSearchParams]);
 
   // Reset pagination when filters change
   useEffect(() => {
@@ -48,7 +32,6 @@ function HomePage() {
     ...pagination
   });
 
-  // Handler updates
   const handleSearch = (term) => {
     setFilters(prev => ({ ...prev, search: term }));
   };

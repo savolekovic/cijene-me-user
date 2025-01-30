@@ -1,0 +1,29 @@
+.not-found-page {
+  min-height: calc(100vh - 56px);
+  background-color: var(--background-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Add some custom styles for the 404 EmptyState */
+.not-found-page .empty-state-icon {
+  width: 80px;
+  height: 80px;
+  background: #f8f9fa;
+}
+
+.not-found-page .empty-state-icon i {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+}
+
+.not-found-page .empty-state-text h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.not-found-page .empty-state-text p {
+  max-width: 400px;
+  margin: 0 auto;
+} 
