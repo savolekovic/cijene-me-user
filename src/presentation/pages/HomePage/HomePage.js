@@ -21,7 +21,8 @@ function HomePage() {
   const { 
     data: productsData = { data: [] }, 
     isLoading: loading, 
-    error 
+    error,
+    refetch 
   } = useProductsQuery(
     Object.entries(filters)
       .filter(([_, v]) => v != null && v !== '')
@@ -72,6 +73,7 @@ function HomePage() {
         currentPage={filters.page}
         sortBy={filters.order_by}
         sortDirection={filters.order_direction}
+        onRetry={refetch}
       />
     </div>
   );

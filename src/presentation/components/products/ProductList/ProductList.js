@@ -1,5 +1,6 @@
 import React from 'react';
 import ProductCard from '../ProductCard/ProductCard';
+import EmptyState from '../../common/EmptyState/EmptyState';
 import './ProductList.css';
 
 const ProductList = ({ 
@@ -10,27 +11,63 @@ const ProductList = ({
   onPageChange,
   currentPage,
   sortBy,
-  sortDirection
+  sortDirection,
+  onRetry
 }) => {
   const productsPerPage = 20;
 
   if (loading) return (
     <div className="container py-5 text-center">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Učitavanje...</span>
+      <div className="loading-state">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Učitavanje...</span>
+        </div>
+        <p className="mt-3 text-muted">Učitavanje proizvoda...</p>
       </div>
     </div>
   );
   
   if (error) return (
     <div className="container py-5">
-      <div className="alert alert-danger" role="alert">
-        Greška pri učitavanju proizvoda
-      </div>
+      <EmptyState
+        icon="bi-exclamation-triangle"
+        title="Došlo je do greške"
+        subtitle="Nismo uspjeli učitati proizvode. Molimo pokušajte ponovo."
+        action={
+          <button 
+            className="btn btn-primary btn-sm"
+            onClick={onRetry}
+          >
+            <i className="bi bi-arrow-clockwise me-2"></i>
+            Pokušaj ponovo
+          </button>
+        }
+      />
     </div>
   );
 
-  if (!Array.isArray(products)) return null;
+  if (!Array.isArray(products) || products.length === 0) {
+    return (
+      <div className="container py-5">
+        <EmptyState
+          icon="bi-search"
+          title="Nema rezultata"
+          subtitle="Pokušajte sa drugačijim filterima ili pretragom"
+          action={
+            <div className="d-flex gap-2">
+              <button 
+                className="btn btn-outline-secondary btn-sm"
+                onClick={() => window.location.href = '/'}
+              >
+                <i className="bi bi-house-door me-2"></i>
+                Početna
+              </button>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
 
   const handleSortChange = (event) => {
     const [newOrderBy, newOrderDirection] = event.target.value.split('-');
