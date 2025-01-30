@@ -2,7 +2,6 @@
   "name": "cijene-me-web-user",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://cijene-me-api.onrender.com",
   "dependencies": {
     "@tanstack/react-query": "^5.64.2",
     "@vercel/analytics": "^1.4.1",
@@ -39,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "http-proxy-middleware": "^2.0.6"
   }
-}
+} 
