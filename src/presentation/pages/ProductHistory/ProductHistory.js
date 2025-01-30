@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
+import { srLatn } from 'date-fns/locale';
 import { useProductEntriesQuery } from '../../hooks/products/useProductEntriesQuery';
 import { useProductStatisticsQuery } from '../../hooks/products/useProductStatisticsQuery';
 import EmptyState from '../../components/common/EmptyState/EmptyState';
@@ -29,10 +31,22 @@ function ProductHistory() {
     return new Date(dateString).toLocaleDateString('me', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     });
+  };
+
+  const formatRelativeTime = (dateString) => {
+    try {
+      const distance = formatDistanceToNow(new Date(dateString), { 
+        addSuffix: true,
+        locale: srLatn 
+      });
+      
+      // Replace "pre" with "prije"
+      return distance.replace('pre', 'prije');
+    } catch (error) {
+      return dateString;
+    }
   };
 
   if (entriesLoading || statsLoading) {
@@ -119,7 +133,7 @@ function ProductHistory() {
                 </span>
                 <span>
                   <i className="bi bi-calendar3 me-1"></i>
-                  Od {formatDate(statistics?.first_entry_date)}
+                  Dodato {formatDate(statistics?.first_entry_date)}
                 </span>
               </div>
             </div>
@@ -133,13 +147,15 @@ function ProductHistory() {
                 <i className="bi bi-tag-fill me-2"></i>
                 Posljednja cijena
               </div>
-              <div className="stat-value">
-                {statistics?.latest_price}€
+              <div className="stat-value-wrapper">
+                <span className="stat-value">
+                  {statistics?.latest_price}€
+                </span>
                 {statistics?.price_change && (
-                  <div className={`price-change ${statistics.price_change > 0 ? 'price-up' : 'price-down'}`}>
+                  <span className={`price-change ${statistics.price_change > 0 ? 'price-up' : 'price-down'}`}>
                     <i className={`bi bi-arrow-${statistics.price_change > 0 ? 'up' : 'down'}`}></i>
                     {Math.abs(statistics.price_change_percentage).toFixed(1)}%
-                  </div>
+                  </span>
                 )}
               </div>
             </div>
@@ -205,7 +221,7 @@ function ProductHistory() {
                     <td>{entry.store_location.store_brand.name}</td>
                     <td>{entry.store_location.address}</td>
                     <td className="price-cell">{entry.price}€</td>
-                    <td>{formatDate(entry.created_at)}</td>
+                    <td>{formatRelativeTime(entry.created_at)}</td>
                   </tr>
                 ))}
               </tbody>
