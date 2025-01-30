@@ -3,7 +3,7 @@ import axiosRetry from 'axios-retry';
 import { ApiError } from '../../core/errors/ApiError';
 
 const axiosClient = axios.create({
-  baseURL: 'https://cijene-me-api.onrender.com/',
+  baseURL: '/api',
   timeout: 10000,
 });
 
