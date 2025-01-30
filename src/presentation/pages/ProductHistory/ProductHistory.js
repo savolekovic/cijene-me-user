@@ -6,7 +6,7 @@ import './ProductHistory.css';
 
 function ProductHistory() {
   const { id } = useParams();
-  const [filters, setFilters] = useState({
+  const [filters] = useState({
     page: 1,
     per_page: 20
   });
