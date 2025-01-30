@@ -80,13 +80,6 @@
   color: var(--primary-hover);
 }
 
-.product-image {
-  height: 200px;
-  object-fit: contain;
-  padding: 1rem;
-  background-color: white;
-}
-
 .btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);

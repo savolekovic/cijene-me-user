@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useCategoriesQuery } from '../hooks/useProductsQuery';
-import FilterPanel from './filters/FilterPanel';
-import ActiveFilters from './filters/ActiveFilters';
+import { useCategoriesQuery } from '../../../../hooks/products/useProductsQuery';
+import FilterPanel from '../FilterPanel/FilterPanel';
+import ActiveFilters from '../ActiveFilters/ActiveFilters';
 import './SearchFilters.css';
 
 /**

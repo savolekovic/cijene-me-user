@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { ProductRepositoryImpl } from '../../infrastructure/repositories/ProductRepositoryImpl';
+import { container } from '../../../di/container';
 
-const productRepository = new ProductRepositoryImpl();
+const productRepository = container.get('productRepository');
 
 export function useProductsQuery(filters = {}) {
   const defaultFilters = {
@@ -14,7 +14,10 @@ export function useProductsQuery(filters = {}) {
   return useQuery({
     queryKey: ['products', filters],
     queryFn: () => productRepository.getProducts({ ...defaultFilters, ...filters }),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0,
+    cacheTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 }
 

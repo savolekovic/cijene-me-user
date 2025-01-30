@@ -1,4 +1,3 @@
-import { GetProducts } from '../core/useCases/product/GetProducts';
 import { ProductRepositoryImpl } from '../infrastructure/repositories/ProductRepositoryImpl';
 
 class Container {
@@ -32,13 +31,10 @@ class Container {
     }
     return repository;
   }
+
+  register(key, instance) {
+    this.#repositories.set(key, instance);
+  }
 }
 
-export const container = Container.getInstance();
-
-// Register implementations
-const productRepository = new ProductRepositoryImpl();
-const getProductsUseCase = new GetProducts(productRepository);
-
-container.register('productRepository', productRepository);
-container.register('getProductsUseCase', getProductsUseCase); 
+export const container = Container.getInstance(); 

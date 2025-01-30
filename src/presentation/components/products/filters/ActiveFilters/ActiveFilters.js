@@ -17,12 +17,19 @@ const ActiveFilters = ({ selectedFilters, categories, onRemoveFilter, onClearAll
       }
     }
 
-    // Price range
-    if (selectedFilters.min_price || selectedFilters.max_price) {
+    // Price range - split into separate pills for min and max
+    if (selectedFilters.min_price) {
       pills.push({
-        id: 'price-range',
-        label: `€${selectedFilters.min_price || '0'} - €${selectedFilters.max_price || '∞'}`,
-        type: 'price'
+        id: 'min-price',
+        label: `Od €${selectedFilters.min_price}`,
+        type: 'min_price'
+      });
+    }
+    if (selectedFilters.max_price) {
+      pills.push({
+        id: 'max-price',
+        label: `Do €${selectedFilters.max_price}`,
+        type: 'max_price'
       });
     }
 

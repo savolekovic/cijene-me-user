@@ -1,5 +1,6 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import { ApiError } from '../../core/errors/ApiError';
 
 const axiosClient = axios.create({
   baseURL: 'https://cijene-me-api.onrender.com/',
@@ -14,5 +15,19 @@ axiosRetry(axiosClient, {
       || error.code === 'ECONNABORTED';
   }
 });
+
+axiosClient.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response) {
+      throw new ApiError(
+        error.response.data.message,
+        error.response.status,
+        error.response.data
+      );
+    }
+    throw error;
+  }
+);
 
 export default axiosClient; 

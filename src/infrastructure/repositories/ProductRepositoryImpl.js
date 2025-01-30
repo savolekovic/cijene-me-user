@@ -1,4 +1,4 @@
-import { ProductRepository } from '../../core/repositories/ProductRepository';
+import { ProductRepository } from '../../core/domain/repositories/ProductRepository';
 import axiosClient from '../api/axiosClient';
 
 export class ProductRepositoryImpl extends ProductRepository {
