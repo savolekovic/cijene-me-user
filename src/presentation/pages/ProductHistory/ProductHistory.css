@@ -3,32 +3,75 @@
   background-color: var(--background-color);
 }
 
-.history-product-image {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
+/* Back Link */
+.history-back-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s;
+}
+
+.history-back-link:hover {
+  color: var(--primary-color);
+}
+
+/* Product Header */
+.product-header {
+  background: linear-gradient(to right, #f8f9fa, white);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.history-product-image-wrapper {
   background: white;
-  border-radius: 8px;
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.history-product-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
 }
 
 .history-product-title {
   font-size: 1.5rem;
-  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
-/* Price Statistics Cards */
+.history-meta {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Stats Cards */
 .price-stat-card {
   background: white;
-  border-radius: 8px;
-  padding: 1rem;
+  border-radius: 12px;
+  padding: 1.25rem;
   height: 100%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.price-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .stat-label {
   font-size: 0.875rem;
   color: var(--text-muted);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.stat-label i {
+  font-size: 1rem;
 }
 
 .stat-value {
@@ -36,12 +79,44 @@
   font-weight: 600;
 }
 
-/* Price History Table */
+.price-change {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.price-up {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.price-down {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+/* Table Design */
 .price-history-table {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.table-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: #2c3e50;
 }
 
 .table {
@@ -64,12 +139,21 @@
   font-size: 0.875rem;
 }
 
+.table tbody tr:hover {
+  background-color: rgba(0,0,0,0.01);
+}
+
 .price-cell {
   font-weight: 600;
   color: var(--primary-color);
 }
 
+/* Responsive Design */
 @media (max-width: 576px) {
+  .product-header {
+    padding: 1.5rem;
+  }
+
   .history-product-image {
     width: 60px;
     height: 60px;
@@ -86,5 +170,11 @@
   .table thead th,
   .table tbody td {
     padding: 0.75rem;
+  }
+
+  .history-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 } 

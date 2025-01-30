@@ -94,24 +94,33 @@ function ProductHistory() {
       <div className="container py-4">
         <div className="row mb-4">
           <div className="col-12">
-            <Link to="/" className="btn btn-link btn-sm ps-0">
+            <Link to="/" className="history-back-link">
               <i className="bi bi-arrow-left me-2"></i>
               Nazad na proizvode
             </Link>
           </div>
         </div>
 
-        <div className="row mb-4">
-          <div className="col-12">
-            <div className="d-flex align-items-center mb-4">
+        <div className="product-header mb-4">
+          <div className="d-flex align-items-center">
+            <div className="history-product-image-wrapper me-3">
               <img 
                 src={product?.image_url || '/placeholder.png'} 
                 alt={product?.name}
-                className="history-product-image me-3"
+                className="history-product-image"
               />
-              <div>
-                <h1 className="history-product-title">{product?.name}</h1>
-                <p className="text-muted mb-0">Istorija cijena</p>
+            </div>
+            <div>
+              <h1 className="history-product-title mb-1">{product?.name}</h1>
+              <div className="history-meta">
+                <span className="me-3">
+                  <i className="bi bi-clock-history me-1"></i>
+                  {statistics?.total_entries} unosa
+                </span>
+                <span>
+                  <i className="bi bi-calendar3 me-1"></i>
+                  Od {formatDate(statistics?.first_entry_date)}
+                </span>
               </div>
             </div>
           </div>
@@ -120,46 +129,74 @@ function ProductHistory() {
         <div className="row mb-4">
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
-              <div className="stat-label">Posljednja cijena</div>
+              <div className="stat-label">
+                <i className="bi bi-tag-fill me-2"></i>
+                Posljednja cijena
+              </div>
               <div className="stat-value">
                 {statistics?.latest_price}€
                 {statistics?.price_change && (
-                  <small className={`d-block mt-1 ${statistics.price_change > 0 ? 'text-danger' : 'text-success'}`}>
-                    {statistics.price_change > 0 ? '↑' : '↓'} {Math.abs(statistics.price_change_percentage).toFixed(1)}%
-                  </small>
+                  <div className={`price-change ${statistics.price_change > 0 ? 'price-up' : 'price-down'}`}>
+                    <i className={`bi bi-arrow-${statistics.price_change > 0 ? 'up' : 'down'}`}></i>
+                    {Math.abs(statistics.price_change_percentage).toFixed(1)}%
+                  </div>
                 )}
               </div>
             </div>
           </div>
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
-              <div className="stat-label">Najniža cijena</div>
+              <div className="stat-label">
+                <i className="bi bi-graph-down-arrow me-2"></i>
+                Najniža cijena
+              </div>
               <div className="stat-value text-success">{statistics?.lowest_price}€</div>
             </div>
           </div>
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
-              <div className="stat-label">Najviša cijena</div>
+              <div className="stat-label">
+                <i className="bi bi-graph-up-arrow me-2"></i>
+                Najviša cijena
+              </div>
               <div className="stat-value text-danger">{statistics?.highest_price}€</div>
             </div>
           </div>
           <div className="col-md-3 col-6 mb-3">
             <div className="price-stat-card">
-              <div className="stat-label">Prosječna cijena</div>
+              <div className="stat-label">
+                <i className="bi bi-calculator me-2"></i>
+                Prosječna cijena
+              </div>
               <div className="stat-value text-primary">{statistics?.average_price}€</div>
             </div>
           </div>
         </div>
 
         <div className="price-history-table">
+          <div className="table-header">
+            <h3 className="table-title">Istorija cijena</h3>
+          </div>
           <div className="table-responsive">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Prodavnica</th>
-                  <th>Lokacija</th>
-                  <th>Cijena</th>
-                  <th>Datum</th>
+                  <th>
+                    <i className="bi bi-shop me-2"></i>
+                    Prodavnica
+                  </th>
+                  <th>
+                    <i className="bi bi-geo-alt me-2"></i>
+                    Lokacija
+                  </th>
+                  <th>
+                    <i className="bi bi-cash me-2"></i>
+                    Cijena
+                  </th>
+                  <th>
+                    <i className="bi bi-calendar-date me-2"></i>
+                    Datum
+                  </th>
                 </tr>
               </thead>
               <tbody>
