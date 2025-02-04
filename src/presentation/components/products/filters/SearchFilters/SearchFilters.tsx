@@ -1,25 +1,15 @@
-import React, { useState, useCallback } from 'react';
-import { useCategoriesQuery } from '../../../../hooks/products/useProductsQuery';
+import React, { useState } from 'react';
 import FilterPanel from '../FilterPanel/FilterPanel';
 import ActiveFilters from '../ActiveFilters/ActiveFilters';
 import { ProductFilters } from '../../../../../core/types/Product';
 import './SearchFilters.css';
+import { useCategoriesQuery } from 'presentation/hooks/products/useCategoriesQuery';
 
 interface SearchFiltersProps {
   onSearch: (term: string) => void;
   onFilterChange: (filters: Partial<ProductFilters>) => void;
   selectedFilters: ProductFilters;
 }
-
-// Custom debounce hook
-const useDebounce = (callback: (value: string) => void, delay: number) => {
-  return useCallback((value: string) => {
-    const timeoutId = setTimeout(() => {
-      callback(value);
-    }, delay);
-    return () => clearTimeout(timeoutId);
-  }, [callback, delay]);
-};
 
 const SearchFilters: React.FC<SearchFiltersProps> = ({ 
   onSearch, 
@@ -35,13 +25,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
     isLoading: categoriesLoading
   } = useCategoriesQuery(isFilterOpen);
 
-  const debouncedSearch = useDebounce(onSearch, 300);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    debouncedSearch(value);
-  };
 
   const handleFilterPanelOpen = () => {
     setTempFilters(selectedFilters);
@@ -90,8 +73,11 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                 type="text" 
                 className="form-control border-start-0 ps-0"
                 placeholder="Pretraži proizvode..."
-                onChange={handleSearchChange}
                 value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  onSearch(e.target.value);
+                }}
               />
               <button 
                 className="btn btn-outline-secondary" 

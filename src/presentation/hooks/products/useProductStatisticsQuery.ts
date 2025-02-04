@@ -10,7 +10,6 @@ export function useProductStatisticsQuery(productId: number) {
     queryKey: ['product-statistics', productId],
     queryFn: async () => {
       const response = await productRepository.getProductStatistics(productId);
-      console.log('API Request URL:', `/api/products/${productId}/statistics`);
       return response;
     },
     enabled: !!productId,

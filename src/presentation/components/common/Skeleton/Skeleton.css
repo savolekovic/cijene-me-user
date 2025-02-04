@@ -19,7 +19,7 @@
   height: 200px;
   border-radius: 4px;
   margin-bottom: 1rem;
-  @extend .skeleton;
+  background: inherit;
 }
 
 .skeleton-title {
@@ -27,7 +27,6 @@
   width: 80%;
   margin-bottom: 0.75rem;
   border-radius: 4px;
-  @extend .skeleton;
 }
 
 .skeleton-text {
@@ -35,11 +34,17 @@
   width: 100%;
   margin-bottom: 0.5rem;
   border-radius: 4px;
-  @extend .skeleton;
 }
 
 .skeleton-text.short {
   width: 60%;
+}
+
+.skeleton-image,
+.skeleton-title,
+.skeleton-text {
+  background: inherit;
+  animation: inherit;
 }
 
 @keyframes skeleton-loading {
@@ -49,4 +54,18 @@
   100% {
     background-position: 0 50%;
   }
+}
+
+.price-stat-card .skeleton-text,
+.price-stat-card .skeleton-title {
+  background: var(--background-color);
+}
+
+.price-history-table .skeleton-text {
+  height: 20px;
+}
+
+.price-history-table thead .skeleton-text {
+  width: 80%;
+  margin: 0.5rem 0;
 } 

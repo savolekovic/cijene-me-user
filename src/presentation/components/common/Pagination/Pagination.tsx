@@ -5,16 +5,12 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  totalItems?: number;
-  itemsPerPage?: number;
 }
 
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
-  onPageChange,
-  totalItems,
-  itemsPerPage
+  onPageChange
 }) => {
   const getPageNumbers = () => {
     const delta = 2;
@@ -48,13 +44,6 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <nav aria-label="Page navigation">
-      <div className="pagination-info mb-2">
-        {totalItems && itemsPerPage && (
-          <small className="text-muted">
-            Prikazano {Math.min(currentPage * itemsPerPage, totalItems)} od {totalItems} rezultata
-          </small>
-        )}
-      </div>
       <ul className="pagination justify-content-center">
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <button

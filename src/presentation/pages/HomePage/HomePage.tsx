@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
   }, [filters]);
 
-  const { data: productsData, isLoading: loading, error, refetch } = useProductsQuery({
+  const { data: productsData, isLoading, error, refetch } = useProductsQuery({
     ...filters,
     ...pagination
   });
@@ -51,10 +51,10 @@ const HomePage: React.FC = () => {
     }));
   };
 
-  const handleSortChange = (orderBy: OrderBy, orderDirection: 'asc' | 'desc') => {
+  const handleSortChange = (orderBy: string, orderDirection: 'asc' | 'desc') => {
     setFilters(prev => ({
       ...prev,
-      order_by: orderBy,
+      order_by: orderBy as OrderBy,
       order_direction: orderDirection
     }));
   };
@@ -72,12 +72,13 @@ const HomePage: React.FC = () => {
       />
       <ProductList 
         products={productsData?.data ?? []}
-        loading={loading}
+        loading={isLoading}
         error={error?.message ?? null}
-        onSortChange={(orderBy, orderDirection) => 
-          handleSortChange(orderBy as OrderBy, orderDirection as 'asc' | 'desc')}
+        onSortChange={handleSortChange}
         onPageChange={handlePageChange}
         currentPage={pagination.page}
+        totalPages={productsData?.last_page ?? 1}
+        totalItems={productsData?.total ?? 0}
         sortBy={filters.order_by || 'created_at'}
         sortDirection={filters.order_direction || 'desc'}
         onRetry={refetch}

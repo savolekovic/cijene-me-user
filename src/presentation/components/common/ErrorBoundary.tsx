@@ -7,6 +7,8 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -19,6 +21,12 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.setState({
+      hasError: true,
+      error,
+      errorInfo
+    });
+    // Log to error tracking service
     console.error('Uncaught error:', error, errorInfo);
   }
 

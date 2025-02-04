@@ -3,6 +3,9 @@ import ProductCard from '../ProductCard/ProductCard';
 import EmptyState from '../../common/EmptyState/EmptyState';
 import { Product } from '../../../../core/types/Product';
 import './ProductList.css';
+import ProductSkeleton from '../../common/Skeleton/ProductSkeleton';
+import Pagination from '../../common/Pagination/Pagination';
+import { SORT_OPTIONS } from '../../../../core/constants/sortOptions';
 
 interface ProductListProps {
   products: Product[];
@@ -11,10 +14,22 @@ interface ProductListProps {
   onSortChange: (orderBy: string, orderDirection: 'asc' | 'desc') => void;
   onPageChange: (page: number) => void;
   currentPage: number;
+  totalPages: number;
+  totalItems: number;
   sortBy: string;
   sortDirection: 'asc' | 'desc';
   onRetry: () => void;
 }
+
+const LoadingState: React.FC = () => (
+  <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+    {[...Array(10)].map((_, index) => (
+      <div className="col" key={index}>
+        <ProductSkeleton />
+      </div>
+    ))}
+  </div>
+);
 
 const ProductList: React.FC<ProductListProps> = ({
   products,
@@ -23,21 +38,16 @@ const ProductList: React.FC<ProductListProps> = ({
   onSortChange,
   onPageChange,
   currentPage,
+  totalPages,
   sortBy,
   sortDirection,
   onRetry
 }) => {
-  const productsPerPage = 20;
 
   if (loading) {
     return (
-      <div className="container py-5 text-center">
-        <div className="loading-state">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Učitavanje...</span>
-          </div>
-          <p>Učitavanje proizvoda...</p>
-        </div>
+      <div className="container py-4">
+        <LoadingState />
       </div>
     );
   }
@@ -55,6 +65,27 @@ const ProductList: React.FC<ProductListProps> = ({
           </button>
         }
       />
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="container py-5">
+        <EmptyState
+          icon="bi-search"
+          title="Nema rezultata"
+          subtitle="Nismo pronašli proizvode koji odgovaraju vašoj pretrazi. Pokušajte sa drugim filterima."
+          action={
+            <button 
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => window.location.href = '/'}
+            >
+              <i className="bi bi-arrow-counterclockwise me-2"></i>
+              Poništi filtere
+            </button>
+          }
+        />
+      </div>
     );
   }
 
@@ -77,12 +108,11 @@ const ProductList: React.FC<ProductListProps> = ({
             value={`${sortBy}-${sortDirection}`}
             onChange={handleSortChange}
           >
-            <option value="name-asc">Ime (A-Z)</option>
-            <option value="name-desc">Ime (Z-A)</option>
-            <option value="created_at-desc">Najnovije prvo</option>
-            <option value="created_at-asc">Najstarije prvo</option>
-            <option value="barcode-asc">Barkod (rastući)</option>
-            <option value="barcode-desc">Barkod (opadajući)</option>
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -95,41 +125,11 @@ const ProductList: React.FC<ProductListProps> = ({
         ))}
       </div>
 
-      <nav className="mt-4">
-        <ul className="pagination justify-content-center">
-          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-            <button 
-              className="page-link" 
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              Prethodna
-            </button>
-          </li>
-          {[...Array(Math.ceil(products.length / productsPerPage))].map((_, index) => (
-            <li 
-              key={index} 
-              className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
-            >
-              <button 
-                className="page-link"
-                onClick={() => onPageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
-            </li>
-          ))}
-          <li className={`page-item ${currentPage === Math.ceil(products.length / productsPerPage) ? 'disabled' : ''}`}>
-            <button 
-              className="page-link"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === Math.ceil(products.length / productsPerPage)}
-            >
-              Sljedeća
-            </button>
-          </li>
-        </ul>
-      </nav>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 };
