@@ -6,19 +6,19 @@ interface EmptyStateProps {
   title: string;
   subtitle: string;
   action?: ReactNode;
-  size?: 'default' | 'large';
+  size?: 'default' | 'large' | 'medium';
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({
+const EmptyState: React.FC<EmptyStateProps> = React.memo(({
   icon,
   title,
   subtitle,
   action,
-  size = 'default'
+  size = 'medium'
 }) => {
   return (
-    <div className={`empty-state ${size === 'large' ? 'empty-state-large' : ''}`}>
-      <div className={`empty-state-icon ${size === 'large' ? 'empty-state-icon-large' : ''}`}>
+    <div className={`empty-state ${size === 'large' ? 'empty-state-large' : size === 'medium' ? 'empty-state-medium' : ''}`}>
+      <div className={`empty-state-icon ${size === 'large' ? 'empty-state-icon-large' : size === 'medium' ? 'empty-state-icon-medium' : ''}`}>
         <i className={`bi ${icon}`}></i>
       </div>
       <div className="empty-state-text">
@@ -32,6 +32,13 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       )}
     </div>
   );
-};
+}, (prev, next) => {
+  return (
+    prev.icon === next.icon &&
+    prev.title === next.title &&
+    prev.subtitle === next.subtitle &&
+    prev.size === next.size
+  );
+});
 
 export default EmptyState; 

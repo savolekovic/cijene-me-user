@@ -16,8 +16,9 @@ const ProductHistory: React.FC = () => {
   const { id } = useParams() as { id: string };
   const { page, perPage, onPageChange } = usePagination();
 
+  // Query data
   const { 
-    data: entriesData = { data: [], total: 0, last_page: 1 }, 
+    data: entriesData = { data: [], total_count: 0 },
     isLoading: entriesLoading,
     error: entriesError,
     refetch: refetchEntries
@@ -29,8 +30,22 @@ const ProductHistory: React.FC = () => {
     error: statsError
   } = useProductStatisticsQuery(parseInt(id, 10));
 
-  const product = entriesData.data[0]?.product;
+  // Memoize the product to prevent unnecessary re-renders
+  const product = React.useMemo(() => 
+    entriesData.data[0]?.product,
+    [entriesData.data]
+  );
 
+  // Memoize props passed to PriceHistoryTable
+  const tableProps = React.useMemo(() => ({
+    entries: entriesData.data,
+    currentPage: page,
+    totalItems: entriesData.total_count,
+    perPage,
+    onPageChange
+  }), [entriesData.data, entriesData.total_count, page, perPage, onPageChange]);
+
+  // Loading state
   if (entriesLoading || statsLoading) {
     return (
       <div className="container py-4">
@@ -43,6 +58,7 @@ const ProductHistory: React.FC = () => {
     );
   }
 
+  // Error states
   if (!product) {
     return (
       <div className="container py-5">
@@ -98,15 +114,10 @@ const ProductHistory: React.FC = () => {
 
         <ProductHeader product={product} statistics={statistics} />
         {statistics && <ProductStatistics statistics={statistics} />}
-        <PriceHistoryTable 
-          entries={entriesData.data} 
-          currentPage={page}
-          totalPages={entriesData.last_page}
-          onPageChange={onPageChange}
-        />
+        <PriceHistoryTable {...tableProps} />
       </div>
     </div>
   );
 };
 
-export default ProductHistory; 
+export default React.memo(ProductHistory); 

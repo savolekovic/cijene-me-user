@@ -12,7 +12,7 @@ interface ProductHeaderProps {
   statistics?: ProductStatistics;
 }
 
-const ProductHeader: React.FC<ProductHeaderProps> = ({ product, statistics }) => {
+const ProductHeader: React.FC<ProductHeaderProps> = React.memo(({ product, statistics }) => {
   return (
     <div className="product-header mb-4">
       <div className="d-flex align-items-center">
@@ -39,6 +39,13 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({ product, statistics }) =>
       </div>
     </div>
   );
-};
+}, (prev, next) => {
+  return (
+    prev.product?.name === next.product?.name &&
+    prev.product?.image_url === next.product?.image_url &&
+    prev.statistics?.total_entries === next.statistics?.total_entries &&
+    prev.statistics?.first_entry_date === next.statistics?.first_entry_date
+  );
+});
 
 export default ProductHeader; 

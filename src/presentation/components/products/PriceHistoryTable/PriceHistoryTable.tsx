@@ -7,16 +7,36 @@ import './PriceHistoryTable.css';
 interface PriceHistoryTableProps {
   entries: ProductEntry[];
   currentPage: number;
-  totalPages: number;
+  totalItems: number;
+  perPage: number;
   onPageChange: (page: number) => void;
 }
 
-const PriceHistoryTable: React.FC<PriceHistoryTableProps> = ({ 
+const PriceHistoryTable: React.FC<PriceHistoryTableProps> = React.memo(({ 
   entries,
   currentPage,
-  totalPages,
+  totalItems,
+  perPage,
   onPageChange
 }) => {
+  // Memoize pagination props
+  const paginationProps = React.useMemo(() => ({
+    currentPage,
+    totalItems,
+    perPage,
+    onPageChange
+  }), [currentPage, totalItems, perPage, onPageChange]);
+
+  // Only log on actual re-renders
+  React.useEffect(() => {
+    console.log('[Render] PriceHistoryTable:', {
+      entriesCount: entries.length,
+      currentPage,
+      totalItems,
+      perPage
+    });
+  }, [entries.length, currentPage, totalItems, perPage]);
+
   return (
     <div className="price-history-table">
       <div className="table-header">
@@ -56,13 +76,17 @@ const PriceHistoryTable: React.FC<PriceHistoryTableProps> = ({
           </tbody>
         </table>
       </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
+      <Pagination {...paginationProps} />
     </div>
   );
-};
+}, (prev, next) => {
+  // Add proper memoization check
+  return (
+    prev.entries === next.entries &&
+    prev.currentPage === next.currentPage &&
+    prev.totalItems === next.totalItems &&
+    prev.perPage === next.perPage
+  );
+});
 
 export default PriceHistoryTable; 

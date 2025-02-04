@@ -12,7 +12,8 @@ type Filters = ProductFilters & Partial<PaginationState> & Partial<SortState> & 
 type OrderBy = 'name' | 'created_at' | 'barcode';
 
 const HomePage: React.FC = () => {
-  const [filters, setFilters] = useFilterState<Filters>({
+  // Memoize initial filter state
+  const initialFilters = React.useMemo(() => ({
     search: '',
     category_id: null,
     min_price: null,
@@ -21,15 +22,17 @@ const HomePage: React.FC = () => {
     barcode: null,
     order_by: 'created_at' as OrderBy,
     order_direction: 'desc' as const
-  }, {
+  }), []);
+
+  const [filters, setFilters] = useFilterState<Filters>(initialFilters, {
     excludeFromUrl: ['page', 'per_page'],
     debounceMs: 300
   });
 
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [pagination, setPagination] = React.useState<PaginationState>(() => ({
     page: 1,
     per_page: 20
-  });
+  }));
 
   useEffect(() => {
     setPagination(prev => ({ ...prev, page: 1 }));
@@ -40,28 +43,53 @@ const HomePage: React.FC = () => {
     ...pagination
   });
 
-  const handleSearch = (term: string) => {
+  const handleSearch = React.useCallback((term: string) => {
     setFilters(prev => ({ ...prev, search: term }));
-  };
+  }, [setFilters]);
 
-  const handleFilterChange = (newFilters: Partial<ProductFilters>) => {
+  const handleFilterChange = React.useCallback((newFilters: Partial<ProductFilters>) => {
     setFilters(prev => ({
       ...prev,
       ...newFilters
     }));
-  };
+  }, [setFilters]);
 
-  const handleSortChange = (orderBy: string, orderDirection: 'asc' | 'desc') => {
+  const handleSortChange = React.useCallback((orderBy: string, orderDirection: 'asc' | 'desc') => {
     setFilters(prev => ({
       ...prev,
       order_by: orderBy as OrderBy,
       order_direction: orderDirection
     }));
-  };
+  }, [setFilters]);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = React.useCallback((page: number) => {
     setPagination(prev => ({ ...prev, page }));
-  };
+  }, []);
+
+  const productListProps = React.useMemo(() => ({
+    products: productsData?.data ?? [],
+    loading: isLoading,
+    error: error?.message ?? null,
+    onSortChange: handleSortChange,
+    onPageChange: handlePageChange,
+    currentPage: pagination.page,
+    totalItems: productsData?.total_count ?? 0,
+    perPage: pagination.per_page,
+    sortBy: filters.order_by || 'created_at',
+    sortDirection: filters.order_direction || 'desc',
+    onRetry: refetch
+  }), [
+    productsData?.data,
+    isLoading,
+    error?.message,
+    handleSortChange,
+    handlePageChange,
+    pagination.page,
+    pagination.per_page,
+    filters.order_by,
+    filters.order_direction,
+    refetch
+  ]);
 
   return (
     <div className="home-page">
@@ -70,19 +98,7 @@ const HomePage: React.FC = () => {
         onFilterChange={handleFilterChange}
         selectedFilters={filters}
       />
-      <ProductList 
-        products={productsData?.data ?? []}
-        loading={isLoading}
-        error={error?.message ?? null}
-        onSortChange={handleSortChange}
-        onPageChange={handlePageChange}
-        currentPage={pagination.page}
-        totalPages={productsData?.last_page ?? 1}
-        totalItems={productsData?.total ?? 0}
-        sortBy={filters.order_by || 'created_at'}
-        sortDirection={filters.order_direction || 'desc'}
-        onRetry={refetch}
-      />
+      <ProductList {...productListProps} />
     </div>
   );
 };

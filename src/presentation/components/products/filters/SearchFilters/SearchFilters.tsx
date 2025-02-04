@@ -4,6 +4,7 @@ import ActiveFilters from '../ActiveFilters/ActiveFilters';
 import { ProductFilters } from '../../../../../core/types/Product';
 import './SearchFilters.css';
 import { useCategoriesQuery } from 'presentation/hooks/products/useCategoriesQuery';
+import { debounce } from 'lodash';
 
 interface SearchFiltersProps {
   onSearch: (term: string) => void;
@@ -11,7 +12,7 @@ interface SearchFiltersProps {
   selectedFilters: ProductFilters;
 }
 
-const SearchFilters: React.FC<SearchFiltersProps> = ({ 
+const SearchFilters: React.FC<SearchFiltersProps> = React.memo(({ 
   onSearch, 
   onFilterChange, 
   selectedFilters 
@@ -25,6 +26,18 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
     isLoading: categoriesLoading
   } = useCategoriesQuery(isFilterOpen);
 
+  // Memoize debounced search
+  const debouncedSearch = React.useMemo(
+    () => debounce((term: string) => onSearch(term), 300),
+    [onSearch]
+  );
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   const handleFilterPanelOpen = () => {
     setTempFilters(selectedFilters);
@@ -76,7 +89,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                 value={searchValue}
                 onChange={(e) => {
                   setSearchValue(e.target.value);
-                  onSearch(e.target.value);
+                  debouncedSearch(e.target.value);
                 }}
               />
               <button 
@@ -115,6 +128,10 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       />
     </div>
   );
-};
+}, (prev, next) => {
+  return (
+    prev.selectedFilters === next.selectedFilters
+  );
+});
 
 export default SearchFilters; 

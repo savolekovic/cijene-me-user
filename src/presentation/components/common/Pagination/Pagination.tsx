@@ -3,44 +3,63 @@ import './Pagination.css';
 
 interface PaginationProps {
   currentPage: number;
-  totalPages: number;
+  totalItems: number;
+  perPage: number;
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination: React.FC<PaginationProps> = React.memo(({
   currentPage,
-  totalPages,
+  totalItems,
+  perPage,
   onPageChange
 }) => {
-  const getPageNumbers = () => {
-    const delta = 2;
-    const range = [];
-    const rangeWithDots = [];
+  // Memoize calculations
+  const { totalPages, hasNextPage, hasPrevPage } = React.useMemo(() => {
+    const total = Math.ceil(totalItems / perPage);
+    return {
+      totalPages: total,
+      hasNextPage: currentPage < total,
+      hasPrevPage: currentPage > 1
+    };
+  }, [totalItems, perPage, currentPage]);
 
-    for (
-      let i = Math.max(2, currentPage - delta);
-      i <= Math.min(totalPages - 1, currentPage + delta);
-      i++
-    ) {
-      range.push(i);
+  // Memoize page numbers array
+  const pageNumbers = React.useMemo(() => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 || 
+        i === totalPages || 
+        (i >= currentPage - 1 && i <= currentPage + 1)
+      ) {
+        pages.push(i);
+      }
     }
+    return pages;
+  }, [currentPage, totalPages]);
 
-    if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...');
-    } else {
-      rangeWithDots.push(1);
+  // Memoize handlers
+  const handlePrevPage = React.useCallback(() => {
+    onPageChange(currentPage - 1);
+  }, [currentPage, onPageChange]);
+
+  const handleNextPage = React.useCallback(() => {
+    onPageChange(currentPage + 1);
+  }, [currentPage, onPageChange]);
+
+  const handlePageClick = React.useCallback((pageNum: number) => {
+    if (typeof pageNum === 'number') {
+      onPageChange(pageNum);
     }
+  }, [onPageChange]);
 
-    rangeWithDots.push(...range);
-
-    if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages);
-    } else if (totalPages > 1) {
-      rangeWithDots.push(totalPages);
-    }
-
-    return rangeWithDots;
-  };
+  console.log('[Render] Pagination:', {
+    currentPage,
+    totalItems,
+    perPage,
+    hasNextPage
+  });
 
   return (
     <nav aria-label="Page navigation">
@@ -48,7 +67,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <button
             className="page-link"
-            onClick={() => onPageChange(currentPage - 1)}
+            onClick={handlePrevPage}
             disabled={currentPage === 1}
             aria-label="Previous page"
           >
@@ -56,28 +75,25 @@ const Pagination: React.FC<PaginationProps> = ({
           </button>
         </li>
 
-        {getPageNumbers().map((pageNum, index) => (
+        {pageNumbers.map((pageNum, index) => (
           <li
             key={index}
-            className={`page-item ${pageNum === currentPage ? 'active' : ''} ${
-              pageNum === '...' ? 'disabled' : ''
-            }`}
+            className={`page-item ${pageNum === currentPage ? 'active' : ''}`}
           >
             <button
               className="page-link"
-              onClick={() => typeof pageNum === 'number' && onPageChange(pageNum)}
-              disabled={pageNum === '...'}
+              onClick={() => handlePageClick(pageNum as number)}
             >
               {pageNum}
             </button>
           </li>
         ))}
 
-        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+        <li className={`page-item ${!hasNextPage ? 'disabled' : ''}`}>
           <button
             className="page-link"
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            onClick={handleNextPage}
+            disabled={!hasNextPage}
             aria-label="Next page"
           >
             <i className="bi bi-chevron-right"></i>
@@ -86,6 +102,12 @@ const Pagination: React.FC<PaginationProps> = ({
       </ul>
     </nav>
   );
-};
+}, (prev, next) => {
+  return (
+    prev.currentPage === next.currentPage &&
+    prev.totalItems === next.totalItems &&
+    prev.perPage === next.perPage
+  );
+});
 
 export default Pagination; 

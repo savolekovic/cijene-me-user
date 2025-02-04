@@ -31,7 +31,7 @@ export class ProductRepositoryImpl implements ProductRepository {
 
     try {
       console.log('Making request to:', 'products', { filters });
-      const { data } = await this.httpClient.get('products', { 
+      const { data } = await this.httpClient.get('/products/', { 
         params: cleanFilters 
       });
       console.log('Response:', data);
@@ -65,14 +65,14 @@ export class ProductRepositoryImpl implements ProductRepository {
         }, {})
     };
 
-    const { data } = await this.httpClient.get('product-entries', { 
+    const { data } = await this.httpClient.get('/product-entries/', { 
       params: cleanFilters 
     });
     return data;
   }
 
   async searchProducts(term: string): Promise<PaginatedResponse<Product>> {
-    const { data } = await this.httpClient.get('products/', { 
+    const { data } = await this.httpClient.get('/products/', { 
       params: { search: term } 
     });
     return data;

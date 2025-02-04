@@ -1,11 +1,10 @@
 import React from 'react';
-import ProductCard from '../ProductCard/ProductCard';
 import EmptyState from '../../common/EmptyState/EmptyState';
 import { Product } from '../../../../core/types/Product';
-import './ProductList.css';
 import Pagination from '../../common/Pagination/Pagination';
 import { SORT_OPTIONS } from '../../../../core/constants/sortOptions';
 import ProductListSkeleton from '../../common/Skeleton/ProductListSkeleton';
+import ProductCardList from './ProductCardList';
 
 interface ProductListProps {
   products: Product[];
@@ -14,26 +13,39 @@ interface ProductListProps {
   onSortChange: (orderBy: string, orderDirection: 'asc' | 'desc') => void;
   onPageChange: (page: number) => void;
   currentPage: number;
-  totalPages: number;
   totalItems: number;
+  perPage: number;
   sortBy: string;
   sortDirection: 'asc' | 'desc';
   onRetry: () => void;
 }
 
-
-const ProductList: React.FC<ProductListProps> = ({
+const ProductList: React.FC<ProductListProps> = React.memo(({
   products,
   loading,
   error,
   onSortChange,
   onPageChange,
   currentPage,
-  totalPages,
+  totalItems,
+  perPage,
   sortBy,
   sortDirection,
   onRetry
 }) => {
+  // Memoize pagination props
+  const paginationProps = React.useMemo(() => ({
+    currentPage,
+    totalItems,
+    perPage,
+    onPageChange
+  }), [currentPage, totalItems, perPage, onPageChange]);
+
+  const handleSortChange = React.useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+    const [newOrderBy, newOrderDirection] = event.target.value.split('-') as [string, 'asc' | 'desc'];
+    onSortChange(newOrderBy, newOrderDirection);
+  }, [onSortChange]);
+
   if (loading) {
     return (
       <div className="container py-4">
@@ -79,11 +91,6 @@ const ProductList: React.FC<ProductListProps> = ({
     );
   }
 
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const [newOrderBy, newOrderDirection] = event.target.value.split('-') as [string, 'asc' | 'desc'];
-    onSortChange(newOrderBy, newOrderDirection);
-  };
-
   return (
     <div className="container py-4">
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4">
@@ -107,21 +114,17 @@ const ProductList: React.FC<ProductListProps> = ({
         </div>
       </div>
 
-      <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
-        {products.map(product => (
-          <div className="col" key={product.id}>
-            <ProductCard product={product} />
-          </div>
-        ))}
-      </div>
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
+      <ProductCardList products={products} />
+      <Pagination {...paginationProps} />
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  return prevProps.currentPage === nextProps.currentPage &&
+    prevProps.totalItems === nextProps.totalItems &&
+    prevProps.products === nextProps.products &&
+    prevProps.loading === nextProps.loading &&
+    prevProps.sortBy === nextProps.sortBy &&
+    prevProps.sortDirection === nextProps.sortDirection;
+});
 
 export default ProductList; 

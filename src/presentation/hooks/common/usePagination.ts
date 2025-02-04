@@ -1,21 +1,24 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import React from 'react';
 
 interface PaginationConfig {
   initialPage?: number;
   initialPerPage?: number;
 }
 
-export function usePagination({ initialPage = 1, initialPerPage = 20 }: PaginationConfig = {}) {
-  const [page, setPage] = useState(initialPage);
-  const [perPage] = useState(initialPerPage);
+export const usePagination = (initialPage = 1, initialPerPage = 20) => {
+  const [state, setState] = React.useState({
+    page: initialPage,
+    perPage: initialPerPage
+  });
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
+  const onPageChange = React.useCallback((newPage: number) => {
+    setState(prev => ({ ...prev, page: newPage }));
+  }, []);
 
   return {
-    page,
-    perPage,
-    onPageChange: handlePageChange
+    page: state.page,
+    perPage: state.perPage,
+    onPageChange
   };
-} 
+}; 

@@ -5,18 +5,23 @@ import './ProductCard.css';
 
 interface ProductCardProps {
   product: Product;
-  style?: React.CSSProperties;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
   const navigate = useNavigate();
-
-  const handleHistoryClick = () => {
+  
+  // Memoize the handler since it depends on product.id
+  const handleHistoryClick = React.useCallback(() => {
     navigate(`/products/${product.id}/history`);
-  };
+  }, [navigate, product.id]);
 
-  // Let's add some logging to see the product data
-  console.log('Product data:', product);
+  // Only log on actual re-renders
+  React.useEffect(() => {
+    console.log('[Render] ProductCard:', {
+      id: product.id,
+      name: product.name
+    });
+  }, [product.id, product.name]);
 
   return (
     <div className="product-card">
@@ -50,6 +55,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
     </div>
   );
-};
+}, (prev, next) => {
+  // More specific comparison to prevent unnecessary re-renders
+  return (
+    prev.product.id === next.product.id &&
+    prev.product.name === next.product.name &&
+    prev.product.image_url === next.product.image_url
+  );
+});
 
 export default ProductCard; 
