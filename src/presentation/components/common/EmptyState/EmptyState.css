@@ -6,8 +6,9 @@
   padding: 2rem;
   text-align: center;
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   min-height: 300px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .empty-state-icon {
@@ -19,11 +20,22 @@
   background: var(--background-color);
   border-radius: 50%;
   margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
 }
 
 .empty-state-icon i {
   font-size: 1.75rem;
   color: var(--text-muted);
+}
+
+/* Large variant */
+.empty-state-large .empty-state-icon {
+  width: 80px;
+  height: 80px;
+}
+
+.empty-state-large .empty-state-icon i {
+  font-size: 2rem;
 }
 
 .empty-state-text {
@@ -32,7 +44,7 @@
 }
 
 .empty-state-text h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 0.75rem;
@@ -43,14 +55,16 @@
   color: var(--text-muted);
   margin-bottom: 0;
   line-height: 1.5;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .empty-state-action {
-  margin-top: 0.5rem;
+  margin-top: 1rem;
 }
 
 .empty-state .btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   transition: all 0.2s ease;
 } 

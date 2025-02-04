@@ -54,6 +54,7 @@ const ProductHistory: React.FC = () => {
               Nazad na proizvode
             </Link>
           }
+          size="large"
         />
       </div>
     );
@@ -75,6 +76,7 @@ const ProductHistory: React.FC = () => {
               Pokušaj ponovo
             </button>
           }
+          size="large"
         />
       </div>
     );

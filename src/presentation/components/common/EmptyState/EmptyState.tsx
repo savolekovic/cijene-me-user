@@ -6,19 +6,25 @@ interface EmptyStateProps {
   title: string;
   subtitle: string;
   action?: ReactNode;
+  size?: 'default' | 'large';
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({
   icon,
   title,
   subtitle,
-  action
+  action,
+  size = 'default'
 }) => {
   return (
-    <div className="empty-state">
-      <i className={`bi ${icon} empty-state-icon`}></i>
-      <h3 className="empty-state-title">{title}</h3>
-      <p className="empty-state-subtitle">{subtitle}</p>
+    <div className={`empty-state ${size === 'large' ? 'empty-state-large' : ''}`}>
+      <div className={`empty-state-icon ${size === 'large' ? 'empty-state-icon-large' : ''}`}>
+        <i className={`bi ${icon}`}></i>
+      </div>
+      <div className="empty-state-text">
+        <h3>{title}</h3>
+        <p>{subtitle}</p>
+      </div>
       {action && (
         <div className="empty-state-action">
           {action}
