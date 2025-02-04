@@ -29,19 +29,33 @@ const HomePage: React.FC = () => {
     debounceMs: 300
   });
 
-  const [pagination, setPagination] = React.useState<PaginationState>(() => ({
+  // Move pagination state initialization to useMemo
+  const [pagination, setPagination] = React.useState(() => ({
     page: 1,
     per_page: 20
   }));
 
+  // Clean up useEffect dependencies
   useEffect(() => {
     setPagination(prev => ({ ...prev, page: 1 }));
-  }, [filters]);
+  }, [filters.search, filters.category_id, filters.min_price, filters.max_price]); // Only reset page on filter changes
 
+  // Move this up, before the logging effect
   const { data: productsData, isLoading, error, refetch } = useProductsQuery({
     ...filters,
     ...pagination
   });
+
+  // Add development-only logging
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] HomePage:', {
+        filters,
+        pagination,
+        productsCount: productsData?.data.length
+      });
+    }
+  }, [filters, pagination, productsData?.data.length]);
 
   const handleSearch = React.useCallback((term: string) => {
     setFilters(prev => ({ ...prev, search: term }));

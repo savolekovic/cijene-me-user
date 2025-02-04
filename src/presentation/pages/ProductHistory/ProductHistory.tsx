@@ -12,23 +12,28 @@ import './ProductHistory.css';
 import ProductHeader from '../../components/products/ProductHeader/ProductHeader';
 import ProductHeaderSkeleton from '../../components/common/Skeleton/ProductHeaderSkeleton';
 
-const ProductHistory: React.FC = () => {
+const ProductHistory: React.FC = React.memo(() => {
   const { id } = useParams() as { id: string };
+  
+  // Memoize the parsed ID to avoid unnecessary recalculations
+  const productId = React.useMemo(() => parseInt(id, 10), [id]);
+
+  // Memoize pagination props
   const { page, perPage, onPageChange } = usePagination();
 
-  // Query data
+  // Query data with memoized ID
   const { 
     data: entriesData = { data: [], total_count: 0 },
     isLoading: entriesLoading,
     error: entriesError,
     refetch: refetchEntries
-  } = useProductEntriesQuery(parseInt(id, 10), { page, per_page: perPage });
+  } = useProductEntriesQuery(productId, { page, per_page: perPage });
 
   const {
     data: statistics,
     isLoading: statsLoading,
     error: statsError
-  } = useProductStatisticsQuery(parseInt(id, 10));
+  } = useProductStatisticsQuery(productId);
 
   // Memoize the product to prevent unnecessary re-renders
   const product = React.useMemo(() => 
@@ -44,6 +49,17 @@ const ProductHistory: React.FC = () => {
     perPage,
     onPageChange
   }), [entriesData.data, entriesData.total_count, page, perPage, onPageChange]);
+
+  // Add development-only logging
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] ProductHistory:', {
+        productId: id,
+        entriesCount: entriesData?.data.length,
+        hasStatistics: !!statistics
+      });
+    }
+  }, [id, entriesData?.data.length, statistics]);
 
   // Loading state
   if (entriesLoading || statsLoading) {
@@ -118,6 +134,6 @@ const ProductHistory: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
-export default React.memo(ProductHistory); 
+export default ProductHistory; 

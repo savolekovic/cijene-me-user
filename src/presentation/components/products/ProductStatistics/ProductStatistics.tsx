@@ -7,6 +7,17 @@ interface ProductStatisticsProps {
 }
 
 const ProductStatistics: React.FC<ProductStatisticsProps> = React.memo(({ statistics }) => {
+  // Development-only logging - moved outside conditional
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] ProductStatistics:', {
+        latestPrice: statistics.latest_price,
+        priceChange: statistics.price_change,
+        totalEntries: statistics.total_entries
+      });
+    }
+  }, [statistics.latest_price, statistics.price_change, statistics.total_entries]);
+
   return (
     <div className="row mb-4">
       <div className="col-md-3 col-6 mb-3">
@@ -56,12 +67,14 @@ const ProductStatistics: React.FC<ProductStatisticsProps> = React.memo(({ statis
     </div>
   );
 }, (prev, next) => {
+  // More specific comparison
   return (
     prev.statistics.latest_price === next.statistics.latest_price &&
     prev.statistics.price_change === next.statistics.price_change &&
     prev.statistics.lowest_price === next.statistics.lowest_price &&
     prev.statistics.highest_price === next.statistics.highest_price &&
-    prev.statistics.average_price === next.statistics.average_price
+    prev.statistics.average_price === next.statistics.average_price &&
+    prev.statistics.total_entries === next.statistics.total_entries
   );
 });
 

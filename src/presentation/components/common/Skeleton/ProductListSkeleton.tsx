@@ -3,6 +3,13 @@ import ProductSkeleton from './ProductSkeleton';
 import './Skeleton.css';
 
 const ProductListSkeleton: React.FC<{ count?: number }> = React.memo(({ count = 10 }) => {
+  // Development-only logging - moved outside conditional
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] ProductListSkeleton:', { count });
+    }
+  }, [count]);
+
   // Memoize skeleton array
   const skeletons = React.useMemo(() => (
     Array(count).fill(null).map((_, index) => (

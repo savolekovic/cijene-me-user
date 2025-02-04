@@ -29,12 +29,14 @@ const PriceHistoryTable: React.FC<PriceHistoryTableProps> = React.memo(({
 
   // Only log on actual re-renders
   React.useEffect(() => {
-    console.log('[Render] PriceHistoryTable:', {
-      entriesCount: entries.length,
-      currentPage,
-      totalItems,
-      perPage
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] PriceHistoryTable:', {
+        entriesCount: entries.length,
+        currentPage,
+        totalItems,
+        perPage
+      });
+    }
   }, [entries.length, currentPage, totalItems, perPage]);
 
   return (

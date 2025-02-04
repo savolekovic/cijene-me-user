@@ -13,29 +13,36 @@ interface FilterPanelProps {
   onApply: () => void;
 }
 
-const FilterPanel: React.FC<FilterPanelProps> = ({
+const FilterPanel: React.FC<FilterPanelProps> = React.memo(({
   isOpen,
   onClose,
-  categories,
+  categories = [],
   categoriesLoading,
   selectedFilters,
   onFilterChange,
   onClearAll,
   onApply
 }) => {
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    onFilterChange({ 
-      category_id: value ? Number(value) : null 
-    });
-  };
+  // Development-only logging - moved outside conditional
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] FilterPanel:', {
+        isOpen,
+        categoriesCount: categories.length,
+        selectedCategory: selectedFilters.category_id
+      });
+    }
+  }, [isOpen, categories.length, selectedFilters.category_id]);
 
-  const handlePriceChange = (field: 'min_price' | 'max_price') => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    onFilterChange({ 
-      [field]: value ? Number(value) : null 
-    });
-  };
+  // Memoize handlers
+  const handleCategoryChange = React.useCallback((categoryId: number | null) => {
+    onFilterChange({ category_id: categoryId });
+  }, [onFilterChange]);
+
+  const handlePriceChange = React.useCallback((type: 'min_price' | 'max_price', value: string) => {
+    const numValue = value ? parseFloat(value) : null;
+    onFilterChange({ [type]: numValue });
+  }, [onFilterChange]);
 
   const handleBarcodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFilterChange({ 
@@ -75,7 +82,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               <select
                 className="form-select"
                 value={selectedFilters.category_id?.toString() || ''}
-                onChange={handleCategoryChange}
+                onChange={(e) => handleCategoryChange(e.target.value ? Number(e.target.value) : null)}
               >
                 <option value="">Sve kategorije</option>
                 {categories.map(category => (
@@ -95,8 +102,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                   type="number"
                   className="form-control"
                   placeholder="Min"
-                  value={selectedFilters.min_price || ''}
-                  onChange={handlePriceChange('min_price')}
+                  value={selectedFilters.min_price?.toString() || ''}
+                  onChange={(e) => handlePriceChange('min_price', e.target.value)}
                 />
               </div>
               <div className="col">
@@ -104,8 +111,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                   type="number"
                   className="form-control"
                   placeholder="Max"
-                  value={selectedFilters.max_price || ''}
-                  onChange={handlePriceChange('max_price')}
+                  value={selectedFilters.max_price?.toString() || ''}
+                  onChange={(e) => handlePriceChange('max_price', e.target.value)}
                 />
               </div>
             </div>
@@ -155,6 +162,15 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       </div>
     </>
   );
-};
+}, (prev, next) => {
+  return (
+    prev.isOpen === next.isOpen &&
+    prev.categories === next.categories &&
+    prev.categoriesLoading === next.categoriesLoading &&
+    prev.selectedFilters.category_id === next.selectedFilters.category_id &&
+    prev.selectedFilters.min_price === next.selectedFilters.min_price &&
+    prev.selectedFilters.max_price === next.selectedFilters.max_price
+  );
+});
 
 export default FilterPanel; 

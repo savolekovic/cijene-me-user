@@ -10,17 +10,18 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
   const navigate = useNavigate();
   
-  // Memoize the handler since it depends on product.id
   const handleHistoryClick = React.useCallback(() => {
     navigate(`/products/${product.id}/history`);
   }, [navigate, product.id]);
 
-  // Only log on actual re-renders
+  // Development-only logging - moved outside conditional
   React.useEffect(() => {
-    console.log('[Render] ProductCard:', {
-      id: product.id,
-      name: product.name
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] ProductCard:', {
+        id: product.id,
+        name: product.name
+      });
+    }
   }, [product.id, product.name]);
 
   return (
@@ -56,11 +57,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
     </div>
   );
 }, (prev, next) => {
-  // More specific comparison to prevent unnecessary re-renders
+  // More specific comparison
   return (
     prev.product.id === next.product.id &&
     prev.product.name === next.product.name &&
-    prev.product.image_url === next.product.image_url
+    prev.product.image_url === next.product.image_url &&
+    prev.product.category?.name === next.product.category?.name &&
+    prev.product.store_count === next.product.store_count
   );
 });
 

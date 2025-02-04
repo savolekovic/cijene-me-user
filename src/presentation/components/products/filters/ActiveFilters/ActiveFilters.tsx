@@ -15,79 +15,70 @@ interface FilterPill {
   type: keyof ProductFilters;
 }
 
-const ActiveFilters: React.FC<ActiveFiltersProps> = ({ 
-  selectedFilters, 
-  categories, 
-  onRemoveFilter, 
-  onClearAll 
+const ActiveFilters: React.FC<ActiveFiltersProps> = React.memo(({
+  selectedFilters,
+  categories,
+  onRemoveFilter,
+  onClearAll
 }) => {
-  const getFilterPills = (): FilterPill[] => {
-    const pills: FilterPill[] = [];
+  // Development-only logging - moved outside conditional
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] ActiveFilters:', {
+        activeFiltersCount: Object.values(selectedFilters).filter(v => v != null).length,
+        selectedCategory: selectedFilters.category_id
+      });
+    }
+  }, [selectedFilters]);
 
+  // Memoize active filters calculation
+  const activeFilters = React.useMemo(() => {
+    const filters = [];
+    
     if (selectedFilters.category_id) {
       const category = categories.find(c => c.id === selectedFilters.category_id);
       if (category) {
-        pills.push({
-          id: `category-${category.id}`,
-          label: category.name,
-          type: 'category_id'
+        filters.push({
+          type: 'category_id',
+          label: `Kategorija: ${category.name}`
         });
       }
     }
 
     if (selectedFilters.min_price) {
-      pills.push({
-        id: 'min-price',
-        label: `Od €${selectedFilters.min_price}`,
-        type: 'min_price'
+      filters.push({
+        type: 'min_price',
+        label: `Min. cijena: ${selectedFilters.min_price}€`
       });
     }
 
     if (selectedFilters.max_price) {
-      pills.push({
-        id: 'max-price',
-        label: `Do €${selectedFilters.max_price}`,
-        type: 'max_price'
+      filters.push({
+        type: 'max_price',
+        label: `Max. cijena: ${selectedFilters.max_price}€`
       });
     }
 
-    if (selectedFilters.has_entries) {
-      pills.push({
-        id: 'has-entries',
-        label: 'Sa cijenama',
-        type: 'has_entries'
-      });
-    }
+    return filters;
+  }, [selectedFilters, categories]);
 
-    if (selectedFilters.barcode) {
-      pills.push({
-        id: 'barcode',
-        label: `Barkod: ${selectedFilters.barcode}`,
-        type: 'barcode'
-      });
-    }
-
-    return pills;
-  };
-
-  const pills = getFilterPills();
-  if (pills.length === 0) return null;
+  if (activeFilters.length === 0) return null;
 
   return (
     <div className="active-filters">
       <div className="filter-pills">
-        {pills.map(pill => (
-          <span key={pill.id} className="filter-pill">
-            {pill.label}
+        {activeFilters.map(filter => (
+          <span key={filter.type} className="filter-pill">
+            {filter.label}
             <button 
               className="btn-remove" 
-              onClick={() => onRemoveFilter(pill.type)}
+              onClick={() => onRemoveFilter(filter.type as keyof ProductFilters)}
             >
               <i className="bi bi-x"></i>
             </button>
           </span>
         ))}
-        {pills.length > 0 && (
+        {activeFilters.length > 0 && (
           <button className="btn btn-link btn-sm" onClick={onClearAll}>
             Poništi sve
           </button>
@@ -95,6 +86,11 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
       </div>
     </div>
   );
-};
+}, (prev, next) => {
+  return (
+    prev.selectedFilters === next.selectedFilters &&
+    prev.categories === next.categories
+  );
+});
 
 export default ActiveFilters; 

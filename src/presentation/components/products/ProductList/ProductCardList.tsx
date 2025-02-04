@@ -7,10 +7,16 @@ interface ProductCardListProps {
 }
 
 const ProductCardList = React.memo(({ products }: ProductCardListProps) => {
-  // Only log on actual re-renders
+  // Development-only logging - moved outside conditional
   React.useEffect(() => {
-    console.log('[Render] ProductCardList with', products.length, 'products');
-  }, [products.length]);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] ProductCardList:', {
+        productsCount: products.length,
+        firstProductId: products[0]?.id,
+        lastProductId: products[products.length - 1]?.id
+      });
+    }
+  }, [products]);
 
   return (
     <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
@@ -21,9 +27,6 @@ const ProductCardList = React.memo(({ products }: ProductCardListProps) => {
       ))}
     </div>
   );
-}, (prev, next) => {
-  // Only re-render if the products array reference changes
-  return prev.products === next.products;
-});
+}, (prev, next) => prev.products === next.products);
 
 export default ProductCardList; 

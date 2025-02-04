@@ -29,21 +29,12 @@ export class ProductRepositoryImpl implements ProductRepository {
         }, {})
     };
 
-    try {
-      console.log('Making request to:', 'products', { filters });
-      const { data } = await this.httpClient.get('/products/', { 
-        params: cleanFilters 
-      });
-      console.log('Response:', data);
-      return data;
-    } catch (error) {
-      console.error('Request failed:', error);
-      throw error;
-    }
+    const { data } = await this.httpClient.get('/products/', { params: cleanFilters });
+    return data;
   }
 
   async getCategories(): Promise<Category[]> {
-    const { data } = await this.httpClient.get('categories/simple', {});
+    const { data } = await this.httpClient.get('categories/simple/');
     return data;
   }
 
@@ -80,7 +71,6 @@ export class ProductRepositoryImpl implements ProductRepository {
 
   async getProductStatistics(productId: number): Promise<ProductStatistics> {
     const { data } = await this.httpClient.get(`product-entries/product/${productId}/statistics`);
-    console.log('Statistics response:', data);
     return data;
   }
 } 

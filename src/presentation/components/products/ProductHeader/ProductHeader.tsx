@@ -13,6 +13,17 @@ interface ProductHeaderProps {
 }
 
 const ProductHeader: React.FC<ProductHeaderProps> = React.memo(({ product, statistics }) => {
+  // Development-only logging - moved outside conditional
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Render] ProductHeader:', {
+        productName: product?.name,
+        hasStatistics: !!statistics,
+        totalEntries: statistics?.total_entries
+      });
+    }
+  }, [product?.name, statistics]);
+
   return (
     <div className="product-header mb-4">
       <div className="d-flex align-items-center">
