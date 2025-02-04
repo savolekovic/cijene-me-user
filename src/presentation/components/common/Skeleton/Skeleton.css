@@ -8,7 +8,9 @@
 }
 
 .skeleton {
-  background-color: #eee;
+  background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 10s infinite linear;
   border-radius: 4px;
 }
 
@@ -36,17 +38,27 @@
 
 /* Product Skeleton */
 .card.h-100 {
-  border: none;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
   background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
 }
 
-.card.h-100 .skeleton {
-  margin: 0;
+.card.h-100 .skeleton-image {
+  height: 200px;
+  background: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .card.h-100 .card-body {
   padding: 1rem;
+}
+
+@media (max-width: 576px) {
+  .card.h-100 .skeleton-image {
+    height: 160px;
+  }
 }
 
 /* Price History Table Skeleton */
@@ -60,10 +72,16 @@
 }
 
 /* Statistics Card Skeleton */
-.price-stat-card .skeleton-text,
-.price-stat-card .skeleton-title {
-  background: inherit;
-  animation: inherit;
+.price-stat-card.h-100 {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  height: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.price-stat-card.h-100 .skeleton {
+  margin: 0;
 }
 
 /* Product Header Skeleton */
