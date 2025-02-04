@@ -3,9 +3,9 @@ import ProductCard from '../ProductCard/ProductCard';
 import EmptyState from '../../common/EmptyState/EmptyState';
 import { Product } from '../../../../core/types/Product';
 import './ProductList.css';
-import ProductSkeleton from '../../common/Skeleton/ProductSkeleton';
 import Pagination from '../../common/Pagination/Pagination';
 import { SORT_OPTIONS } from '../../../../core/constants/sortOptions';
+import ProductListSkeleton from '../../common/Skeleton/ProductListSkeleton';
 
 interface ProductListProps {
   products: Product[];
@@ -21,15 +21,6 @@ interface ProductListProps {
   onRetry: () => void;
 }
 
-const LoadingState: React.FC = () => (
-  <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
-    {[...Array(10)].map((_, index) => (
-      <div className="col" key={index}>
-        <ProductSkeleton />
-      </div>
-    ))}
-  </div>
-);
 
 const ProductList: React.FC<ProductListProps> = ({
   products,
@@ -43,11 +34,10 @@ const ProductList: React.FC<ProductListProps> = ({
   sortDirection,
   onRetry
 }) => {
-
   if (loading) {
     return (
       <div className="container py-4">
-        <LoadingState />
+        <ProductListSkeleton />
       </div>
     );
   }

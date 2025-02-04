@@ -10,6 +10,7 @@ import ProductStatistics from '../../components/products/ProductStatistics/Produ
 import PriceHistoryTable from '../../components/products/PriceHistoryTable/PriceHistoryTable';
 import './ProductHistory.css';
 import ProductHeader from '../../components/products/ProductHeader/ProductHeader';
+import ProductHeaderSkeleton from '../../components/common/Skeleton/ProductHeaderSkeleton';
 
 const ProductHistory: React.FC = () => {
   const { id } = useParams() as { id: string };
@@ -33,6 +34,7 @@ const ProductHistory: React.FC = () => {
   if (entriesLoading || statsLoading) {
     return (
       <div className="container py-4">
+        <ProductHeaderSkeleton />
         <div className="mb-4">
           <StatisticsSkeleton />
         </div>

@@ -3,12 +3,12 @@ import './Skeleton.css';
 
 const ProductSkeleton: React.FC = () => {
   return (
-    <div className="card product-skeleton">
-      <div className="skeleton-image"></div>
+    <div className="card h-100">
+      <div className="skeleton" style={{ height: '200px', borderRadius: '8px 8px 0 0' }}></div>
       <div className="card-body">
-        <div className="skeleton-title"></div>
-        <div className="skeleton-text"></div>
-        <div className="skeleton-text short"></div>
+        <div className="skeleton" style={{ height: '20px', width: '80%', marginBottom: '8px' }}></div>
+        <div className="skeleton" style={{ height: '16px', width: '60%', marginBottom: '8px' }}></div>
+        <div className="skeleton" style={{ height: '16px', width: '40%' }}></div>
       </div>
     </div>
   );
