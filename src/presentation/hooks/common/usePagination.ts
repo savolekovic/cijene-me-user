@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 interface PaginationConfig {
   initialPage?: number;
@@ -6,7 +6,8 @@ interface PaginationConfig {
 }
 
 export const usePagination = (config: PaginationConfig = {}) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   // Get values from URL or use defaults
   const page = Number(searchParams.get('page')) || config.initialPage || 1;
@@ -16,7 +17,7 @@ export const usePagination = (config: PaginationConfig = {}) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('page', newPage.toString());
     newParams.set('per_page', perPage.toString());
-    setSearchParams(newParams, { replace: true });
+    navigate(`?${newParams.toString()}`, { replace: false });
   };
 
   return {

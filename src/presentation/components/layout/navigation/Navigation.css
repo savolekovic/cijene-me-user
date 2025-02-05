@@ -19,7 +19,7 @@
 }
 
 .nav-logo:hover {
-  color: var(--primary-color);
+  text-decoration: none;
 }
 
 .nav-links {

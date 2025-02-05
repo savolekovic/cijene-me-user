@@ -5,9 +5,10 @@ import { PaginatedResponse, ProductRepository } from '../../../core/domain/repos
 
 const productRepository = container.resolve('productRepository') as ProductRepository;
 
-export const useProductsQuery = (filters: ProductFilters) => {
+export function useProductsQuery(filters: ProductFilters) {
   return useQuery<PaginatedResponse<Product>, Error>({
     queryKey: ['products', filters],
-    queryFn: () => productRepository.getProducts(filters)
+    queryFn: () => productRepository.getProducts(filters),
+    staleTime: 30000
   });
-};
+}

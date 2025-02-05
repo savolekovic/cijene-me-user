@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 interface UseFilterStateOptions {
   excludeFromUrl?: string[];
@@ -8,68 +8,93 @@ interface UseFilterStateOptions {
 
 export type FilterValue = string | number | boolean | null | undefined;
 
+// Extract parsing logic to a pure function
+const parseUrlState = <T extends Record<string, FilterValue>>(
+  urlParams: URLSearchParams
+): Partial<T> => {
+  const urlState = Object.fromEntries(urlParams.entries());
+  return Object.entries(urlState).reduce<Partial<T>>((acc, [key, value]) => {
+    let parsedValue: FilterValue;
+    
+    if (value === 'true') parsedValue = true;
+    else if (value === 'false') parsedValue = false;
+    else if (value === 'null') parsedValue = null;
+    else if (!isNaN(Number(value))) parsedValue = Number(value);
+    else parsedValue = value;
+
+    return { ...acc, [key]: parsedValue };
+  }, {});
+};
+
 export function useFilterState<T extends Record<string, FilterValue>>(
   initialState: T,
   options: UseFilterStateOptions = {}
 ): [T, (newState: T | ((prev: T) => T)) => void] {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isUrlUpdate = useRef(false);
+  const debounceTimer = useRef<NodeJS.Timeout>();
+  const lastUrl = useRef(searchParams.toString());
   
-  // Initialize state directly from URL params
-  const [state, setState] = useState<T>(() => {
-    const urlState = Object.fromEntries(searchParams.entries());
-    
-    // Parse URL values
-    const parsedState = Object.entries(urlState).reduce<Partial<T>>((acc, [key, value]) => {
-      let parsedValue: FilterValue;
-      
-      if (value === 'true') parsedValue = true;
-      else if (value === 'false') parsedValue = false;
-      else if (value === 'null') parsedValue = null;
-      else if (!isNaN(Number(value))) parsedValue = Number(value);
-      else parsedValue = value;
+  // Initialize state from URL params
+  const [state, setState] = useState<T>(() => ({
+    ...initialState,
+    ...parseUrlState<T>(searchParams)
+  }));
 
-      return {
-        ...acc,
-        [key]: parsedValue
-      };
-    }, {});
-
-    // Use URL values first, fall back to initialState for missing values only
-    return {
-      ...initialState,
-      ...parsedState // URL values take precedence
-    };
-  });
-
-  // Update URL only when state changes intentionally
+  // Cleanup debounce timer
   useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
+
+  // Update URL when state changes
+  useEffect(() => {
+    if (isUrlUpdate.current) {
+      isUrlUpdate.current = false;
+      return;
+    }
+
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    debounceTimer.current = setTimeout(() => {
       const newParams = new URLSearchParams();
       
-      // Preserve all non-null state values in URL
       Object.entries(state).forEach(([key, value]) => {
-        if (value != null && value !== '') {
+        if (value != null && value !== '' && !options.excludeFromUrl?.includes(key)) {
           newParams.set(key, String(value));
         }
       });
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Updating URL:', {
-          currentParams: Object.fromEntries(searchParams.entries()),
-          newState: state,
-          newParams: Object.fromEntries(newParams.entries())
-        });
+      const newSearch = newParams.toString();
+      if (newSearch !== lastUrl.current) {
+        lastUrl.current = newSearch;
+        navigate(`?${newSearch}`, { replace: false });
       }
-
-      setSearchParams(newParams, { replace: true });
     }, options.debounceMs || 0);
+  }, [state, navigate, options.debounceMs, options.excludeFromUrl]);
 
-    return () => clearTimeout(debounceTimeout);
-  }, [state, setSearchParams, options.debounceMs]);
+  // Listen for URL changes
+  useEffect(() => {
+    const currentUrl = searchParams.toString();
+    if (currentUrl === lastUrl.current) {
+      return;
+    }
 
-  const setFilterState = useCallback((
-    newState: T | ((prev: T) => T)
-  ) => {
+    lastUrl.current = currentUrl;
+    isUrlUpdate.current = true;
+    setState({
+      ...initialState,
+      ...parseUrlState<T>(searchParams)
+    });
+  }, [searchParams, initialState]);
+
+  const setFilterState = useCallback((newState: T | ((prev: T) => T)) => {
     setState(prev => {
       const nextState = typeof newState === 'function' 
         ? (newState as (prev: T) => T)(prev)

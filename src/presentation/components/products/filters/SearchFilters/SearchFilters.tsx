@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import FilterPanel from '../FilterPanel/FilterPanel';
 import ActiveFilters from '../ActiveFilters/ActiveFilters';
-import { ProductFilters } from '../../../../../core/types/Product';
+import { Category, ProductFilters } from '../../../../../core/types/Product';
 import './SearchFilters.css';
 import { useCategoriesQuery } from 'presentation/hooks/products/useCategoriesQuery';
 import { debounce } from 'lodash';
@@ -10,19 +10,21 @@ interface SearchFiltersProps {
   onSearch: (term: string) => void;
   onFilterChange: (filters: Partial<ProductFilters>) => void;
   selectedFilters: ProductFilters;
+  categories: Category[];
 }
 
 const SearchFilters: React.FC<SearchFiltersProps> = React.memo(({ 
   onSearch, 
   onFilterChange, 
-  selectedFilters 
+  selectedFilters, 
+  categories
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(selectedFilters.search || '');
   const [tempFilters, setTempFilters] = useState<ProductFilters>(selectedFilters);
 
   const {
-    data: categories = [],
+    data: categoriesData = [],
     isLoading: categoriesLoading
   } = useCategoriesQuery(isFilterOpen);
 
@@ -108,7 +110,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = React.memo(({
           <div className="col-12">
             <ActiveFilters
               selectedFilters={selectedFilters}
-              categories={categories}
+              categories={categoriesData}
               onRemoveFilter={(type) => onFilterChange({ [type]: null })}
               onClearAll={handleClearAll}
             />
@@ -119,7 +121,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = React.memo(({
       <FilterPanel
         isOpen={isFilterOpen}
         onClose={handleClose}
-        categories={categories}
+        categories={categoriesData}
         categoriesLoading={categoriesLoading}
         selectedFilters={tempFilters}
         onFilterChange={handleTempFilterChange}

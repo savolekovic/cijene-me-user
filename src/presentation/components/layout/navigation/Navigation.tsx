@@ -1,13 +1,21 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Navigation.css';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/?order_by=created_at&order_direction=desc&page=1&per_page=20');
+    
+    // If we're already on home page, do nothing
+    if (location.pathname === '/' && location.search) {
+      return;
+    }
+    
+    // Otherwise, go to home with default sorting
+    navigate('/?order_by=created_at&order_direction=desc');
   };
 
   return (

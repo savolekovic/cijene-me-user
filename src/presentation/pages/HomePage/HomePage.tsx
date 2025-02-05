@@ -1,71 +1,80 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import SearchFilters from '../../components/products/filters/SearchFilters/SearchFilters';
 import ProductList from '../../components/products/ProductList/ProductList';
 import { useProductsQuery } from '../../hooks/products/useProductsQuery';
 import { useFilterState, FilterValue } from '../../hooks/useFilterState';
 import './HomePage.css';
 import { ProductFilters } from '../../../core/types/Product';
-import { PaginationState, SortState } from '../../hooks/types';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
+import { useCategoriesQuery } from 'presentation/hooks/products/useCategoriesQuery';
 
+// Add back the type definition
 type OrderDirection = 'asc' | 'desc';
+
+interface PaginationState {
+  page: number;
+  per_page: number;
+}
+
+interface SortState {
+  order_by: string;
+  order_direction: OrderDirection; // Now it uses the type
+}
+
 type Filters = ProductFilters & Partial<PaginationState> & Partial<SortState> & Record<string, FilterValue>;
 
 type OrderBy = 'name' | 'created_at';
 
 const HomePage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   
-  // Memoize initial filter state with URL values
-  const initialFilters = React.useMemo(() => {
-    const page = Number(searchParams.get('page')) || 1;
-    const per_page = Number(searchParams.get('per_page')) || 20;
-    const category_id = searchParams.get('category_id') ? Number(searchParams.get('category_id')) : null;
-    const min_price = searchParams.get('min_price') ? Number(searchParams.get('min_price')) : null;
-    const max_price = searchParams.get('max_price') ? Number(searchParams.get('max_price')) : null;
-    const direction = searchParams.get('order_direction');
+  // Add categories query at the page level
+  const { data: categories } = useCategoriesQuery();
+  
+  const urlParams = React.useMemo(() => ({
+    page: Number(searchParams.get('page')) || 1,
+    per_page: Number(searchParams.get('per_page')) || 20,
+    category_id: searchParams.get('category_id') ? Number(searchParams.get('category_id')) : null,
+    min_price: searchParams.get('min_price') ? Number(searchParams.get('min_price')) : null,
+    max_price: searchParams.get('max_price') ? Number(searchParams.get('max_price')) : null,
+    search: searchParams.get('search') || '',
+    order_by: (searchParams.get('order_by') || 'created_at') as OrderBy,
+    order_direction: (searchParams.get('order_direction') || 'desc') as OrderDirection
+  }), [searchParams]);
 
-    return {
-      search: searchParams.get('search') || '',
-      category_id,
-      min_price,
-      max_price,
-      has_entries: searchParams.get('has_entries') === 'true' || null,
-      barcode: searchParams.get('barcode') || null,
-      order_by: (searchParams.get('order_by') || 'created_at') as OrderBy,
-      order_direction: (direction === 'asc' || direction === 'desc' ? direction : 'desc') as OrderDirection,
-      page,
-      per_page
-    };
-  }, [searchParams]);
-
-  const [filters, setFilters] = useFilterState<Filters>(initialFilters, {
+  const [filters, setFilters] = useFilterState<Filters>(urlParams, {
     debounceMs: 300
   });
 
-  // Only reset page when search filters change, not pagination or sorting
-  const lastSearchRef = React.useRef({
-    search: filters.search,
-    category_id: filters.category_id,
-    min_price: filters.min_price,
-    max_price: filters.max_price
-  });
+  // Reset page when filters change (except page/perPage changes)
+  React.useEffect(() => {
+    const shouldResetPage = 
+      filters.search !== urlParams.search ||
+      filters.category_id !== urlParams.category_id ||
+      filters.min_price !== urlParams.min_price ||
+      filters.max_price !== urlParams.max_price ||
+      filters.order_by !== urlParams.order_by ||
+      filters.order_direction !== urlParams.order_direction;
 
-  useEffect(() => {
-    const lastSearch = lastSearchRef.current;
-    if (filters.search !== lastSearch.search ||
-        filters.category_id !== lastSearch.category_id ||
-        filters.min_price !== lastSearch.min_price ||
-        filters.max_price !== lastSearch.max_price) {
+    if (shouldResetPage) {
       setFilters(prev => ({ ...prev, page: 1 }));
-      lastSearchRef.current = {
-        search: filters.search,
-        category_id: filters.category_id,
-        min_price: filters.min_price,
-        max_price: filters.max_price
-      };
     }
-  }, [filters.search, filters.category_id, filters.min_price, filters.max_price, setFilters]);
+  }, [
+    filters.search,
+    filters.category_id,
+    filters.min_price,
+    filters.max_price,
+    filters.order_by,
+    filters.order_direction,
+    urlParams,
+    setFilters
+  ]);
+
+  // Scroll to top only when page number changes
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [urlParams.page]); // Only depend on page number
 
   const handleSearch = React.useCallback((term: string) => {
     setFilters(prev => ({ ...prev, search: term }));
@@ -86,42 +95,36 @@ const HomePage: React.FC = () => {
     }));
   }, [setFilters]);
 
-  // Scroll to top when page changes
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }, [filters.page]);
-
   const handlePageChange = React.useCallback((page: number) => {
     setFilters(prev => ({ ...prev, page }));
   }, [setFilters]);
 
-  const { data: productsData, isLoading, error, refetch } = useProductsQuery({
-    ...filters // Now includes all pagination params
+  // Query products using URL params directly
+  const { data, isLoading, error, refetch } = useProductsQuery({
+    ...filters,
+    page: urlParams.page,
+    per_page: urlParams.per_page
   });
 
   const productListProps = React.useMemo(() => ({
-    products: productsData?.data ?? [],
+    products: data?.data ?? [],
     loading: isLoading,
     error: error?.message ?? null,
     onSortChange: handleSortChange,
     onPageChange: handlePageChange,
-    currentPage: filters.page || 1,
-    totalItems: productsData?.total_count ?? 0,
-    perPage: filters.per_page || 20,
+    currentPage: urlParams.page,
+    totalItems: data?.total_count ?? 0,
+    perPage: urlParams.per_page,
     sortBy: filters.order_by || 'created_at',
     sortDirection: filters.order_direction || 'desc',
     onRetry: refetch
   }), [
-    productsData?.data,
+    data,
     isLoading,
-    error?.message,
+    error,
     handleSortChange,
     handlePageChange,
-    filters.page,
-    filters.per_page,
+    urlParams,
     filters.order_by,
     filters.order_direction,
     refetch
@@ -133,6 +136,7 @@ const HomePage: React.FC = () => {
         onSearch={handleSearch}
         onFilterChange={handleFilterChange}
         selectedFilters={filters}
+        categories={categories || []}
       />
       <ProductList {...productListProps} />
     </div>
