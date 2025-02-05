@@ -23,16 +23,6 @@ const FilterPanel: React.FC<FilterPanelProps> = React.memo(({
   onClearAll,
   onApply
 }) => {
-  // Development-only logging - moved outside conditional
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Render] FilterPanel:', {
-        isOpen,
-        categoriesCount: categories.length,
-        selectedCategory: selectedFilters.category_id
-      });
-    }
-  }, [isOpen, categories.length, selectedFilters.category_id]);
 
   // Memoize handlers
   const handleCategoryChange = React.useCallback((categoryId: number | null) => {

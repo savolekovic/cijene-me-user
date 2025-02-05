@@ -14,16 +14,6 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product }) => {
     navigate(`/products/${product.id}/history`);
   }, [navigate, product.id]);
 
-  // Development-only logging - moved outside conditional
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Render] ProductCard:', {
-        id: product.id,
-        name: product.name
-      });
-    }
-  }, [product.id, product.name]);
-
   return (
     <div className="product-card">
       <div className="product-image-container">

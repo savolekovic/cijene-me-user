@@ -33,6 +33,15 @@ const ProductList: React.FC<ProductListProps> = React.memo(({
   sortDirection,
   onRetry
 }) => {
+  // Calculate start and end item numbers
+  const startItem = (currentPage - 1) * perPage + 1;
+  const endItem = Math.min(currentPage * perPage, totalItems);
+  
+  const paginationInfo = React.useMemo(() => {
+    if (totalItems === 0) return 'Nema proizvoda';
+    return `Prikazano ${startItem}-${endItem} od ${totalItems} proizvoda`;
+  }, [startItem, endItem, totalItems]);
+
   // Memoize pagination props
   const paginationProps = React.useMemo(() => ({
     currentPage,
@@ -94,8 +103,8 @@ const ProductList: React.FC<ProductListProps> = React.memo(({
   return (
     <div className="container py-4">
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4">
-        <div className="text-muted mb-3 mb-md-0">
-          Prikazano {products.length} proizvoda
+        <div className="text-muted">
+          {paginationInfo}
         </div>
         <div className="d-flex gap-2 align-items-center">
           <label className="text-muted me-2">Sortiraj po:</label>

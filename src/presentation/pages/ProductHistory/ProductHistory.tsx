@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useProductEntriesQuery } from '../../hooks/products/useProductEntriesQuery';
 import { useProductStatisticsQuery } from '../../hooks/products/useProductStatisticsQuery';
 import { usePagination } from '../../hooks/common/usePagination';
@@ -18,8 +18,11 @@ const ProductHistory: React.FC = React.memo(() => {
   // Memoize the parsed ID to avoid unnecessary recalculations
   const productId = React.useMemo(() => parseInt(id, 10), [id]);
 
-  // Memoize pagination props
-  const { page, perPage, onPageChange } = usePagination();
+  // Use pagination with URL state
+  const { page, perPage, onPageChange } = usePagination({
+    initialPage: 1,
+    initialPerPage: 20
+  });
 
   // Query data with memoized ID
   const { 
@@ -61,6 +64,13 @@ const ProductHistory: React.FC = React.memo(() => {
     }
   }, [id, entriesData?.data.length, statistics]);
 
+  const navigate = useNavigate();
+  
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate(-1); // Go back to previous page, preserving history
+  };
+
   // Loading state
   if (entriesLoading || statsLoading) {
     return (
@@ -83,10 +93,14 @@ const ProductHistory: React.FC = React.memo(() => {
           title="Proizvod nije pronađen"
           subtitle="Proizvod koji tražite ne postoji ili je uklonjen."
           action={
-            <Link to="/" className="btn btn-outline-primary btn-sm">
+            <a 
+              href="/" 
+              className="btn btn-outline-primary btn-sm"
+              onClick={handleBackClick}
+            >
               <i className="bi bi-arrow-left me-2"></i>
               Nazad na proizvode
-            </Link>
+            </a>
           }
           size="large"
         />
@@ -121,10 +135,10 @@ const ProductHistory: React.FC = React.memo(() => {
       <div className="container py-4">
         <div className="row mb-4">
           <div className="col-12">
-            <Link to="/" className="history-back-link">
+            <a href="/" className="history-back-link" onClick={handleBackClick}>
               <i className="bi bi-arrow-left me-2"></i>
               Nazad na proizvode
-            </Link>
+            </a>
           </div>
         </div>
 

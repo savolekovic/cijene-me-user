@@ -21,15 +21,6 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = React.memo(({
   onRemoveFilter,
   onClearAll
 }) => {
-  // Development-only logging - moved outside conditional
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Render] ActiveFilters:', {
-        activeFiltersCount: Object.values(selectedFilters).filter(v => v != null).length,
-        selectedCategory: selectedFilters.category_id
-      });
-    }
-  }, [selectedFilters]);
 
   // Memoize active filters calculation
   const activeFilters = React.useMemo(() => {

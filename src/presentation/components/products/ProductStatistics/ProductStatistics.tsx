@@ -28,10 +28,15 @@ const ProductStatistics: React.FC<ProductStatisticsProps> = React.memo(({ statis
           </div>
           <div className="stat-value-wrapper">
             <span className="stat-value">{statistics?.latest_price}€</span>
-            {statistics?.price_change && (
+            {statistics?.price_change ? (
               <span className={`price-change ${statistics.price_change > 0 ? 'price-down' : 'price-up'}`}>
                 <i className={`bi bi-arrow-${statistics.price_change > 0 ? 'up' : 'down'}`}></i>
                 {Math.abs(statistics.price_change_percentage).toFixed(1)}%
+              </span>
+            ) : (
+              <span className="price-change price-unchanged">
+                <i className="bi bi-dash-circle"></i>
+                Bez promjene
               </span>
             )}
           </div>
