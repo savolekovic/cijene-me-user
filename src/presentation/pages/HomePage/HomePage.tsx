@@ -11,7 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 type OrderDirection = 'asc' | 'desc';
 type Filters = ProductFilters & Partial<PaginationState> & Partial<SortState> & Record<string, FilterValue>;
 
-type OrderBy = 'name' | 'created_at' | 'barcode';
+type OrderBy = 'name' | 'created_at';
 
 const HomePage: React.FC = () => {
   const [searchParams] = useSearchParams();

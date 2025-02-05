@@ -68,7 +68,7 @@ const ProductHistory: React.FC = React.memo(() => {
   
   const handleBackClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate(-1); // Go back to previous page, preserving history
+    navigate(-1);
   };
 
   // Loading state

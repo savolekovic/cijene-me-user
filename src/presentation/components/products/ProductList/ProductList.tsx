@@ -55,6 +55,11 @@ const ProductList: React.FC<ProductListProps> = React.memo(({
     onSortChange(newOrderBy, newOrderDirection);
   }, [onSortChange]);
 
+  const handleResetClick = () => {
+    // Update to use default sorting
+    window.location.href = '/?order_by=created_at&order_direction=desc';
+  };
+
   if (loading) {
     return (
       <div className="container py-4">
@@ -89,7 +94,7 @@ const ProductList: React.FC<ProductListProps> = React.memo(({
           action={
             <button 
               className="btn btn-outline-secondary btn-sm"
-              onClick={() => window.location.href = '/'}
+              onClick={handleResetClick}
             >
               <i className="bi bi-arrow-counterclockwise me-2"></i>
               Poništi filtere

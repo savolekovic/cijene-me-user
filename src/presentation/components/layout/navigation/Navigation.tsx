@@ -1,14 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Navigation.css';
 
 const Navigation: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate('/?order_by=created_at&order_direction=desc&page=1&per_page=20');
+  };
+
   return (
     <nav className="navigation">
       <div className="nav-left">
-        <Link to="/" className="nav-logo">
+        <a href="/" className="nav-logo" onClick={handleLogoClick}>
           Cijene.me
-        </Link>
+        </a>
       </div>
     </nav>
   );
