@@ -18,10 +18,6 @@ export function useFilterState<T extends Record<string, FilterValue>>(
   const [state, setState] = useState<T>(() => {
     const urlState = Object.fromEntries(searchParams.entries());
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Initializing state from URL:', { urlState, initialState });
-    }
-
     // Parse URL values
     const parsedState = Object.entries(urlState).reduce<Partial<T>>((acc, [key, value]) => {
       let parsedValue: FilterValue;
@@ -39,24 +35,18 @@ export function useFilterState<T extends Record<string, FilterValue>>(
     }, {});
 
     // Use URL values first, fall back to initialState for missing values only
-    const finalState = {
+    return {
       ...initialState,
       ...parsedState // URL values take precedence
     };
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Final state:', finalState);
-    }
-
-    return finalState;
   });
 
-  // Update URL when state changes, but preserve URL values that aren't in state
+  // Update URL only when state changes intentionally
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
-      const newParams = new URLSearchParams(searchParams);
-
-      // Only update params that are actually in the state
+      const newParams = new URLSearchParams();
+      
+      // Preserve all non-null state values in URL
       Object.entries(state).forEach(([key, value]) => {
         if (value != null && value !== '') {
           newParams.set(key, String(value));
