@@ -54,12 +54,14 @@ const Pagination: React.FC<PaginationProps> = React.memo(({
     }
   }, [onPageChange]);
 
-  console.log('[Render] Pagination:', {
-    currentPage,
-    totalItems,
-    perPage,
-    hasNextPage
-  });
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Render] Pagination:', {
+      currentPage,
+      totalItems,
+      perPage,
+      hasNextPage
+    });
+  }
 
   return (
     <nav aria-label="Page navigation">
